@@ -1,0 +1,60 @@
+/* assets/css/dash.css */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+.logo-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+.mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+/* Estilos adicionales para mejor responsividad */
+@media (max-width: 640px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-sm-mobile {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}

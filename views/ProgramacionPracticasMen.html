@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>University System - Monthly Practice Schedule</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <!-- Librerías para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#206cdf",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111721",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .sortable:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .sortable.dark:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        .active-sort {
+            background-color: rgba(32, 108, 223, 0.1);
+        }
+        .active-sort.dark {
+            background-color: rgba(32, 108, 223, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="w-full min-h-screen">
+        <header class="bg-white dark:bg-background-dark shadow-sm px-4 py-3">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-primary rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                            <path d="M12 14l6.16-3.422A12.083 12.083 0 0121 12c0 6.627-5.373 12-12 12S-3 18.627-3 12a12.083 12.083 0 012.84-5.422L12 14z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(3, 0)"></path>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-bold text-gray-800 dark:text-white">University</span>
+                </div>
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div class="grid grid-cols-5 gap-x-4">
+                        <span class="font-semibold">Tipo de documento:</span>
+                        <span class="font-semibold">Código:</span>
+                        <span class="font-semibold">Emisión:</span>
+                        <span class="font-semibold">Revisión:</span>
+                        <span class="font-semibold">Página:</span>
+                        <span>F-AC-01</span>
+                        <span>SC-001-2024</span>
+                        <span>01/01/2024</span>
+                        <span>02</span>
+                        <span>1 de 1</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="container mx-auto px-4 py-8">
+            <h1 class="text-2xl font-bold uppercase text-center text-gray-800 dark:text-white mb-8">
+                Programación de Prácticas Mensuales
+            </h1>
+            
+            <!-- Controles de Interactividad -->
+            <div class="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex flex-wrap gap-4 items-center">
+                    <!-- Búsqueda -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buscar</label>
+                        <input type="text" id="search" placeholder="Buscar en la tabla..." 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                    </div>
+                    
+                    <!-- Filtro por profesor -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="professor-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filtrar por profesor</label>
+                        <select id="professor-filter" 
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                            <option value="">Todos los profesores</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por asignatura -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="subject-filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filtrar por asignatura</label>
+                        <select id="subject-filter" 
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                            <option value="">Todas las asignaturas</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="flex gap-2 items-end">
+                        <button id="reset-filters" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            Restablecer
+                        </button>
+                        <button id="export-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 transition-colors">
+                            Exportar PDF
+                        </button>
+                        <button id="theme-toggle" class="p-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla -->
+            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700" id="table-container">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="data-table">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider sortable" data-column="date" scope="col">
+                                Fecha
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider sortable" data-column="practice" scope="col">
+                                Práctica
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider sortable" data-column="objective" scope="col">
+                                Objetivo
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider sortable" data-column="professor" scope="col">
+                                Profesor
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider sortable" data-column="subject" scope="col">
+                                Asignatura
+                                <span class="sort-icon">↕</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="bg-white dark:bg-background-dark divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Los datos se cargarán dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Información de resultados -->
+            <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                Mostrando <span id="results-count">0</span> de <span id="total-count">0</span> prácticas
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Datos de ejemplo para la tabla
+        const practiceData = [
+            { date: '2024-01-15', practice: 'Laboratorio de Química', objective: 'Identificación de compuestos orgánicos', professor: 'Dr. García', subject: 'Química Orgánica' },
+            { date: '2024-01-17', practice: 'Práctica de Física', objective: 'Leyes de Newton', professor: 'Dra. Martínez', subject: 'Física I' },
+            { date: '2024-01-20', practice: 'Laboratorio de Biología', objective: 'Observación de células', professor: 'Dr. Rodríguez', subject: 'Biología Celular' },
+            { date: '2024-01-22', practice: 'Práctica de Programación', objective: 'Algoritmos de ordenamiento', professor: 'Dr. López', subject: 'Algoritmos' },
+            { date: '2024-01-25', practice: 'Laboratorio de Electrónica', objective: 'Circuitos integrados', professor: 'Dr. Hernández', subject: 'Electrónica Digital' },
+            { date: '2024-01-28', practice: 'Práctica de Matemáticas', objective: 'Cálculo diferencial', professor: 'Dra. Pérez', subject: 'Cálculo I' },
+            { date: '2024-02-01', practice: 'Laboratorio de Química', objective: 'Titulación ácido-base', professor: 'Dr. García', subject: 'Química Analítica' },
+            { date: '2024-02-05', practice: 'Práctica de Física', objective: 'Movimiento parabólico', professor: 'Dra. Martínez', subject: 'Física I' },
+            { date: '2024-02-08', practice: 'Laboratorio de Biología', objective: 'Genética mendeliana', professor: 'Dr. Rodríguez', subject: 'Genética' },
+            { date: '2024-02-12', practice: 'Práctica de Programación', objective: 'Estructuras de datos', professor: 'Dr. López', subject: 'Estructuras de Datos' },
+            { date: '2024-02-15', practice: 'Laboratorio de Electrónica', objective: 'Amplificadores operacionales', professor: 'Dr. Hernández', subject: 'Electrónica Analógica' },
+            { date: '2024-02-18', practice: 'Práctica de Matemáticas', objective: 'Integrales definidas', professor: 'Dra. Pérez', subject: 'Cálculo II' },
+            { date: '2024-02-22', practice: 'Laboratorio de Química', objective: 'Cromatografía', professor: 'Dr. García', subject: 'Química Analítica' },
+            { date: '2024-02-26', practice: 'Práctica de Física', objective: 'Termodinámica', professor: 'Dra. Martínez', subject: 'Física II' },
+            { date: '2024-03-01', practice: 'Laboratorio de Biología', objective: 'Microbiología básica', professor: 'Dr. Rodríguez', subject: 'Microbiología' }
+        ];
+
+        // Estado de la aplicación
+        let currentData = [...practiceData];
+        let sortColumn = 'date';
+        let sortDirection = 'asc';
+        let currentFilters = {
+            search: '',
+            professor: '',
+            subject: ''
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTable();
+            setupEventListeners();
+            updateResultsCount();
+            
+            // Verificar preferencia de tema
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            }
+        });
+
+        // Inicializar la tabla con datos
+        function initializeTable() {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            // Generar filas de la tabla
+            currentData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 
+                    ? 'bg-white dark:bg-background-dark' 
+                    : 'bg-primary/10 dark:bg-primary/20';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatDate(item.date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.practice}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.objective}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.professor}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${item.subject}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Actualizar filtros
+            updateFilters();
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Búsqueda
+            document.getElementById('search').addEventListener('input', function(e) {
+                currentFilters.search = e.target.value.toLowerCase();
+                filterData();
+            });
+            
+            // Filtro por profesor
+            document.getElementById('professor-filter').addEventListener('change', function(e) {
+                currentFilters.professor = e.target.value;
+                filterData();
+            });
+            
+            // Filtro por asignatura
+            document.getElementById('subject-filter').addEventListener('change', function(e) {
+                currentFilters.subject = e.target.value;
+                filterData();
+            });
+            
+            // Botón de restablecer
+            document.getElementById('reset-filters').addEventListener('click', function() {
+                resetFilters();
+            });
+            
+            // Botón de exportar
+            document.getElementById('export-btn').addEventListener('click', function() {
+                exportToPDF();
+            });
+            
+            // Botón de tema
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                toggleTheme();
+            });
+            
+            // Ordenamiento de columnas
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.getAttribute('data-column');
+                    sortTable(column);
+                });
+            });
+        }
+
+        // Filtrar datos
+        function filterData() {
+            let filteredData = [...practiceData];
+            
+            // Aplicar filtro de búsqueda
+            if (currentFilters.search) {
+                filteredData = filteredData.filter(item => 
+                    item.practice.toLowerCase().includes(currentFilters.search) ||
+                    item.objective.toLowerCase().includes(currentFilters.search) ||
+                    item.professor.toLowerCase().includes(currentFilters.search) ||
+                    item.subject.toLowerCase().includes(currentFilters.search)
+                );
+            }
+            
+            // Aplicar filtro por profesor
+            if (currentFilters.professor) {
+                filteredData = filteredData.filter(item => item.professor === currentFilters.professor);
+            }
+            
+            // Aplicar filtro por asignatura
+            if (currentFilters.subject) {
+                filteredData = filteredData.filter(item => item.subject === currentFilters.subject);
+            }
+            
+            currentData = filteredData;
+            sortTable(sortColumn, sortDirection);
+            updateResultsCount();
+        }
+
+        // Ordenar tabla
+        function sortTable(column, direction = null) {
+            // Determinar dirección de ordenamiento
+            if (column === sortColumn) {
+                sortDirection = direction || (sortDirection === 'asc' ? 'desc' : 'asc');
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            // Aplicar ordenamiento
+            currentData.sort((a, b) => {
+                let aValue = a[column];
+                let bValue = b[column];
+                
+                // Para fechas, convertir a objetos Date
+                if (column === 'date') {
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
+                } else {
+                    // Para texto, convertir a minúsculas para ordenamiento case-insensitive
+                    aValue = String(aValue).toLowerCase();
+                    bValue = String(bValue).toLowerCase();
+                }
+                
+                if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            // Actualizar indicadores visuales de ordenamiento
+            updateSortIndicators();
+            
+            // Volver a renderizar la tabla
+            initializeTable();
+        }
+
+        // Actualizar indicadores visuales de ordenamiento
+        function updateSortIndicators() {
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.classList.remove('active-sort');
+                const icon = header.querySelector('.sort-icon');
+                
+                if (header.getAttribute('data-column') === sortColumn) {
+                    header.classList.add('active-sort');
+                    icon.textContent = sortDirection === 'asc' ? '↑' : '↓';
+                } else {
+                    icon.textContent = '↕';
+                }
+            });
+        }
+
+        // Actualizar filtros desplegables
+        function updateFilters() {
+            const professorFilter = document.getElementById('professor-filter');
+            const subjectFilter = document.getElementById('subject-filter');
+            
+            // Obtener valores únicos
+            const professors = [...new Set(practiceData.map(item => item.professor))];
+            const subjects = [...new Set(practiceData.map(item => item.subject))];
+            
+            // Limpiar opciones existentes (excepto la primera)
+            while (professorFilter.children.length > 1) {
+                professorFilter.removeChild(professorFilter.lastChild);
+            }
+            while (subjectFilter.children.length > 1) {
+                subjectFilter.removeChild(subjectFilter.lastChild);
+            }
+            
+            // Agregar opciones
+            professors.forEach(professor => {
+                const option = document.createElement('option');
+                option.value = professor;
+                option.textContent = professor;
+                professorFilter.appendChild(option);
+            });
+            
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectFilter.appendChild(option);
+            });
+            
+            // Restaurar valores seleccionados si existen
+            if (currentFilters.professor) {
+                professorFilter.value = currentFilters.professor;
+            }
+            if (currentFilters.subject) {
+                subjectFilter.value = currentFilters.subject;
+            }
+        }
+
+        // Restablecer filtros
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('professor-filter').value = '';
+            document.getElementById('subject-filter').value = '';
+            
+            currentFilters = {
+                search: '',
+                professor: '',
+                subject: ''
+            };
+            
+            currentData = [...practiceData];
+            sortTable('date', 'asc');
+            updateResultsCount();
+        }
+
+        // Actualizar contador de resultados
+        function updateResultsCount() {
+            document.getElementById('results-count').textContent = currentData.length;
+            document.getElementById('total-count').textContent = practiceData.length;
+        }
+
+        // Alternar tema oscuro/claro
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', isDark);
+            updateThemeIcon(isDark);
+        }
+
+        // Actualizar icono del tema
+        function updateThemeIcon(isDark) {
+            const themeIcon = document.getElementById('theme-icon');
+            if (isDark) {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+            } else {
+                themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+            }
+        }
+
+        // Formatear fecha
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+
+        // Exportar a PDF HORIZONTAL con diseño mejorado
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            // Crear PDF en orientación horizontal (landscape)
+            const pdf = new jsPDF('l', 'mm', 'a4');
+            
+            // Configuración para hoja horizontal
+            const margin = 15;
+            let yPosition = margin;
+            const pageWidth = pdf.internal.pageSize.getWidth(); // 297mm para A4 horizontal
+            const pageHeight = pdf.internal.pageSize.getHeight(); // 210mm para A4 horizontal
+            
+            function addHeader(currentPage, totalPages) {
+                yPosition = margin;
+                
+                // Título UNIPOLI - diseño mejorado
+                pdf.setFontSize(20);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(40, 108, 223); // Color azul primario
+                pdf.text('UNIPOLI', pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 8;
+
+                // Información del documento - diseño compacto
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0); // Negro
+                
+                // Primera línea
+                pdf.text('Tipo de documento: Registro', margin, yPosition);
+                pdf.text('Código: LAB-RG-08', pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += 5;
+                
+                // Segunda línea
+                pdf.text('Emisión: 27 de febrero de 2018', margin, yPosition);
+                pdf.text(`Revisión: 01`, pageWidth / 2, yPosition, { align: 'center' });
+                pdf.text(`Página: ${currentPage} de ${totalPages}`, pageWidth - margin, yPosition, { align: 'right' });
+                yPosition += 8;
+
+                // Línea divisoria
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.5);
+                pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+                yPosition += 12;
+
+                // Título principal
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('PROGRAMACIÓN DE PRÁCTICAS MENSUALES', pageWidth / 2, yPosition, { align: 'center' });
+                yPosition += 15;
+            }
+
+            function addTableHeaders() {
+                // Configuración de tabla optimizada para hoja horizontal
+                const columnWidths = [25, 50, 80, 45, 50]; // Anchos optimizados para horizontal
+                const rowHeight = 10;
+                
+                // Encabezados con estilo mejorado
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(255, 255, 255); // Texto blanco
+                
+                const headers = ['Fecha:', 'Práctica:', 'Objetivo:', 'Profesor:', 'Asignatura:'];
+                let xPosition = margin;
+                
+                // Dibujar fondo de encabezados
+                pdf.setFillColor(40, 108, 223); // Azul primario
+                pdf.rect(margin, yPosition, pageWidth - (2 * margin), rowHeight, 'F');
+                
+                // Texto de encabezados
+                headers.forEach((header, index) => {
+                    pdf.text(header, xPosition + 2, yPosition + 7);
+                    xPosition += columnWidths[index];
+                });
+                
+                yPosition += rowHeight + 2;
+                pdf.setTextColor(0, 0, 0); // Volver a texto negro
+            }
+
+            function addTableData(startIndex, endIndex) {
+                const columnWidths = [25, 50, 80, 45, 50];
+                const rowHeight = 10;
+                const data = currentData.slice(startIndex, endIndex);
+                
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                
+                // Dibujar líneas de la tabla
+                pdf.setDrawColor(200, 200, 200);
+                pdf.setLineWidth(0.3);
+                
+                const tableTop = yPosition;
+                let tableBottom = yPosition;
+                
+                data.forEach((item, rowIndex) => {
+                    // Fondo alternado para mejor legibilidad
+                    if (rowIndex % 2 === 0) {
+                        pdf.setFillColor(245, 247, 250);
+                        pdf.rect(margin, yPosition, pageWidth - (2 * margin), rowHeight, 'F');
+                    }
+                    
+                    let xPosition = margin;
+                    
+                    // Fecha
+                    pdf.text(formatDate(item.date), xPosition + 2, yPosition + 7);
+                    xPosition += columnWidths[0];
+                    
+                    // Práctica
+                    const practiceLines = pdf.splitTextToSize(item.practice, columnWidths[1] - 4);
+                    pdf.text(practiceLines, xPosition + 2, yPosition + 7);
+                    xPosition += columnWidths[1];
+                    
+                    // Objetivo
+                    const objectiveLines = pdf.splitTextToSize(item.objective, columnWidths[2] - 4);
+                    pdf.text(objectiveLines, xPosition + 2, yPosition + 7);
+                    xPosition += columnWidths[2];
+                    
+                    // Profesor
+                    const professorLines = pdf.splitTextToSize(item.professor, columnWidths[3] - 4);
+                    pdf.text(professorLines, xPosition + 2, yPosition + 7);
+                    xPosition += columnWidths[3];
+                    
+                    // Asignatura
+                    const subjectLines = pdf.splitTextToSize(item.subject, columnWidths[4] - 4);
+                    pdf.text(subjectLines, xPosition + 2, yPosition + 7);
+                    
+                    // Línea horizontal
+                    pdf.line(margin, yPosition + rowHeight, pageWidth - margin, yPosition + rowHeight);
+                    yPosition += rowHeight;
+                    tableBottom = yPosition;
+                });
+                
+                // Líneas verticales
+                let xPos = margin;
+                columnWidths.forEach(width => {
+                    pdf.line(xPos, tableTop, xPos, tableBottom);
+                    xPos += width;
+                });
+                pdf.line(pageWidth - margin, tableTop, pageWidth - margin, tableBottom);
+                
+                return data.length;
+            }
+
+            // Calcular número de páginas
+            const rowsPerPage = Math.floor((pageHeight - yPosition - margin) / 10);
+            const totalPages = Math.ceil(currentData.length / rowsPerPage);
+            
+            // Generar páginas
+            for (let page = 1; page <= totalPages; page++) {
+                if (page > 1) {
+                    pdf.addPage('l'); // Nueva página horizontal
+                }
+                
+                addHeader(page, totalPages);
+                addTableHeaders();
+                
+                const startIndex = (page - 1) * rowsPerPage;
+                const endIndex = Math.min(startIndex + rowsPerPage, currentData.length);
+                addTableData(startIndex, endIndex);
+            }
+
+            // Guardar el PDF
+            pdf.save('programacion_practicas_unipoli.pdf');
+        }
+    </script>
+</body>
+</html>
