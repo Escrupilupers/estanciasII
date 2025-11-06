@@ -64,7 +64,7 @@ const PracticeModel = {
     },
 
     addPractice(practice) {
-        const newId = Math.max(...this.practices.map(p => p.id)) + 1;
+        const newId = this.practices.length > 0 ? Math.max(...this.practices.map(p => p.id)) + 1 : 1;
         practice.id = newId;
         this.practices.push(practice);
         return practice;
@@ -97,22 +97,30 @@ const DashboardController = {
     },
 
     bindEvents() {
+        console.log('Inicializando eventos...');
+        
         // Menú móvil
-        document.getElementById('mobile-menu-btn').addEventListener('click', this.openMobileMenu.bind(this));
-        document.getElementById('close-mobile-menu').addEventListener('click', this.closeMobileMenu.bind(this));
-        document.getElementById('mobile-menu-overlay').addEventListener('click', this.closeMobileMenu.bind(this));
-        document.getElementById('mobile-logout-btn').addEventListener('click', () => {
+        this.safeAddEventListener('mobile-menu-btn', 'click', this.openMobileMenu.bind(this));
+        this.safeAddEventListener('close-mobile-menu', 'click', this.closeMobileMenu.bind(this));
+        this.safeAddEventListener('mobile-menu-overlay', 'click', this.closeMobileMenu.bind(this));
+        this.safeAddEventListener('mobile-logout-btn', 'click', () => {
             this.closeMobileMenu();
             this.openLogoutModal();
         });
 
         // Botones de tema
-        document.getElementById('theme-toggle').addEventListener('click', this.toggleTheme.bind(this));
-        document.getElementById('theme-toggle-mobile').addEventListener('click', this.toggleTheme.bind(this));
+        this.safeAddEventListener('theme-toggle', 'click', this.toggleTheme.bind(this));
+        this.safeAddEventListener('theme-toggle-mobile', 'click', this.toggleTheme.bind(this));
 
-        // Botones principales
-        document.getElementById('new-practice-btn').addEventListener('click', this.openNewPracticeModal.bind(this));
-        document.getElementById('logout-btn').addEventListener('click', this.openLogoutModal.bind(this));
+        // Botones principales - CORREGIDOS
+        this.safeAddEventListener('new-practice-btn', 'click', () => {
+            console.log('Botón nueva práctica clickeado');
+            this.openNewPracticeModal();
+        });
+        
+        this.safeAddEventListener('logout-btn', 'click', () => {
+            this.openLogoutModal();
+        });
 
         // Botones de prácticas
         this.bindPracticeButtons();
@@ -121,69 +129,127 @@ const DashboardController = {
         this.bindModalEvents();
     },
 
+    safeAddEventListener(elementId, event, handler) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.addEventListener(event, handler);
+            console.log(`Evento ${event} agregado a ${elementId}`);
+        } else {
+            console.warn(`Elemento ${elementId} no encontrado`);
+        }
+    },
+
     bindPracticeButtons() {
+        console.log('Vinculando botones de prácticas...');
+        
         // Botones Editar Práctica
         document.querySelectorAll('.edit-practice-btn').forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const practice = PracticeModel.getAllPractices()[index];
-                this.openEditPracticeModal(practice);
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Botón editar clickeado:', index);
+                const practices = PracticeModel.getAllPractices();
+                if (practices[index]) {
+                    this.openEditPracticeModal(practices[index]);
+                }
             });
         });
 
         // Botones Eliminar Práctica
         document.querySelectorAll('.delete-practice-btn').forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const practice = PracticeModel.getAllPractices()[index];
-                this.openDeletePracticeModal(practice.id);
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Botón eliminar clickeado:', index);
+                const practices = PracticeModel.getAllPractices();
+                if (practices[index]) {
+                    this.openDeletePracticeModal(practices[index].id);
+                }
             });
         });
     },
 
     bindModalEvents() {
+        console.log('Vinculando eventos de modales...');
+        
         // Cerrar modales con botones
-        document.getElementById('close-new-modal').addEventListener('click', () => this.closeModal('new-practice-modal'));
-        document.getElementById('close-edit-modal').addEventListener('click', () => this.closeModal('edit-modal'));
-        document.getElementById('close-delete-modal').addEventListener('click', () => this.closeModal('delete-modal'));
-        document.getElementById('close-logout-modal').addEventListener('click', () => this.closeModal('logout-modal'));
+        this.safeAddEventListener('close-new-modal', 'click', () => this.closeModal('new-practice-modal'));
+        this.safeAddEventListener('close-edit-modal', 'click', () => this.closeModal('edit-modal'));
+        this.safeAddEventListener('close-delete-modal', 'click', () => this.closeModal('delete-modal'));
+        this.safeAddEventListener('close-logout-modal', 'click', () => this.closeModal('logout-modal'));
 
-        document.getElementById('cancel-new').addEventListener('click', () => this.closeModal('new-practice-modal'));
-        document.getElementById('cancel-edit').addEventListener('click', () => this.closeModal('edit-modal'));
-        document.getElementById('cancel-delete').addEventListener('click', () => this.closeModal('delete-modal'));
-        document.getElementById('cancel-logout').addEventListener('click', () => this.closeModal('logout-modal'));
+        this.safeAddEventListener('cancel-new', 'click', () => this.closeModal('new-practice-modal'));
+        this.safeAddEventListener('cancel-edit', 'click', () => this.closeModal('edit-modal'));
+        this.safeAddEventListener('cancel-delete', 'click', () => this.closeModal('delete-modal'));
+        this.safeAddEventListener('cancel-logout', 'click', () => this.closeModal('logout-modal'));
 
         // Cerrar modales al hacer clic fuera
         ['new-practice-modal', 'edit-modal', 'delete-modal', 'logout-modal'].forEach(modalId => {
             const modal = document.getElementById(modalId);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    this.closeModal(modalId);
-                }
-            });
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        this.closeModal(modalId);
+                    }
+                });
+            }
         });
 
-        // Formularios
-        document.getElementById('new-practice-form').addEventListener('submit', this.handleNewPracticeSubmit.bind(this));
-        document.getElementById('edit-practice-form').addEventListener('submit', this.handleEditPracticeSubmit.bind(this));
-        document.getElementById('confirm-delete').addEventListener('click', this.handleDeletePractice.bind(this));
-        document.getElementById('confirm-logout').addEventListener('click', this.handleLogout.bind(this));
+        // Formularios - CORREGIDOS
+        const newPracticeForm = document.getElementById('new-practice-form');
+        if (newPracticeForm) {
+            newPracticeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleNewPracticeSubmit(e);
+            });
+        }
+
+        const editPracticeForm = document.getElementById('edit-practice-form');
+        if (editPracticeForm) {
+            editPracticeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleEditPracticeSubmit(e);
+            });
+        }
+        
+        // Botones de confirmación - CORREGIDOS
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', () => {
+                console.log('Confirmar eliminación clickeado');
+                this.handleDeletePractice();
+            });
+        }
+
+        const confirmLogoutBtn = document.getElementById('confirm-logout');
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.addEventListener('click', () => {
+                this.handleLogout();
+            });
+        }
     },
 
     loadInitialData() {
-        // Aquí podrías cargar datos iniciales desde el servidor
         console.log('Datos iniciales cargados');
     },
 
     // Menú móvil
     openMobileMenu() {
-        document.getElementById('mobile-menu').classList.add('open');
-        document.getElementById('mobile-menu-overlay').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        if (mobileMenu && overlay) {
+            mobileMenu.classList.add('open');
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
     },
 
     closeMobileMenu() {
-        document.getElementById('mobile-menu').classList.remove('open');
-        document.getElementById('mobile-menu-overlay').classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-menu-overlay');
+        if (mobileMenu && overlay) {
+            mobileMenu.classList.remove('open');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
     },
 
     // Tema
@@ -217,44 +283,62 @@ const DashboardController = {
 
     // Modales
     openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            console.log(`Abriendo modal: ${modalId}`);
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        } else {
+            console.error(`Modal ${modalId} no encontrado`);
+        }
     },
 
     closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
     },
 
     openNewPracticeModal() {
+        console.log('Abriendo modal de nueva práctica');
         this.openModal('new-practice-modal');
     },
 
     openEditPracticeModal(practice) {
-        document.getElementById('edit-practice-id').value = practice.id;
-        document.getElementById('edit-practice-date').value = practice.date;
-        document.getElementById('edit-practice-name').value = practice.name;
-        document.getElementById('edit-practice-subject').value = practice.subject;
-        document.getElementById('edit-practice-objective').value = practice.objective;
-        document.getElementById('edit-practice-duration').value = practice.duration;
-        document.getElementById('edit-practice-lab').value = practice.lab;
-        document.getElementById('edit-practice-status').value = practice.status;
-        
-        this.openModal('edit-modal');
+        if (practice) {
+            console.log('Abriendo modal de edición para práctica:', practice.id);
+            document.getElementById('edit-practice-id').value = practice.id;
+            document.getElementById('edit-practice-date').value = practice.date;
+            document.getElementById('edit-practice-name').value = practice.name;
+            document.getElementById('edit-practice-subject').value = practice.subject;
+            document.getElementById('edit-practice-objective').value = practice.objective;
+            document.getElementById('edit-practice-duration').value = practice.duration;
+            document.getElementById('edit-practice-lab').value = practice.lab;
+            document.getElementById('edit-practice-status').value = practice.status;
+            
+            this.openModal('edit-modal');
+        }
     },
 
     openDeletePracticeModal(practiceId) {
-        document.getElementById('confirm-delete').setAttribute('data-id', practiceId);
-        this.openModal('delete-modal');
+        console.log('Abriendo modal de eliminación para práctica:', practiceId);
+        const confirmButton = document.getElementById('confirm-delete');
+        if (confirmButton) {
+            confirmButton.setAttribute('data-id', practiceId);
+            this.openModal('delete-modal');
+        }
     },
 
     openLogoutModal() {
+        console.log('Abriendo modal de logout');
         this.openModal('logout-modal');
     },
 
     // Manejo de formularios
     handleNewPracticeSubmit(e) {
-        e.preventDefault();
+        console.log('Enviando formulario de nueva práctica');
         
         const formData = {
             date: document.getElementById('new-practice-date').value,
@@ -265,6 +349,14 @@ const DashboardController = {
             lab: document.getElementById('new-practice-lab').value,
             status: document.getElementById('new-practice-status').value
         };
+
+        console.log('Datos del formulario:', formData);
+
+        // Validación básica
+        if (!formData.date || !formData.name || !formData.subject) {
+            alert('Por favor complete todos los campos requeridos');
+            return;
+        }
 
         // Aquí enviarías los datos al servidor
         PracticeModel.addPractice(formData);
@@ -277,7 +369,7 @@ const DashboardController = {
     },
 
     handleEditPracticeSubmit(e) {
-        e.preventDefault();
+        console.log('Enviando formulario de edición');
         
         const practiceId = document.getElementById('edit-practice-id').value;
         const formData = {
@@ -290,6 +382,8 @@ const DashboardController = {
             status: document.getElementById('edit-practice-status').value
         };
 
+        console.log('Editando práctica:', practiceId, formData);
+
         // Aquí enviarías los datos al servidor
         PracticeModel.updatePractice(practiceId, formData);
         
@@ -298,35 +392,49 @@ const DashboardController = {
     },
 
     handleDeletePractice() {
-        const practiceId = this.getAttribute('data-id');
-        
-        // Aquí enviarías la solicitud de eliminación al servidor
-        PracticeModel.deletePractice(practiceId);
-        
-        this.closeModal('delete-modal');
-        this.showSuccessMessage('¡Práctica eliminada exitosamente!');
+        const confirmButton = document.getElementById('confirm-delete');
+        if (confirmButton) {
+            const practiceId = confirmButton.getAttribute('data-id');
+            console.log('Eliminando práctica:', practiceId);
+            
+            // Aquí enviarías la solicitud de eliminación al servidor
+            const deletedPractice = PracticeModel.deletePractice(practiceId);
+            
+            if (deletedPractice) {
+                this.closeModal('delete-modal');
+                this.showSuccessMessage('¡Práctica eliminada exitosamente!');
+            } else {
+                alert('Error al eliminar la práctica');
+            }
+        }
     },
 
     handleLogout() {
         // Aquí redirigirías al usuario a la página de login
         console.log('Cerrando sesión...');
-        window.location.href = 'login.html';
+        if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+            // window.location.href = 'login.html';
+            alert('Redirigiendo al login... (simulación)');
+        }
     },
 
     showSuccessMessage(message) {
         const successMessage = document.getElementById('success-message');
         const successText = document.getElementById('success-text');
         
-        successText.textContent = message;
-        successMessage.classList.remove('hidden');
-        
-        setTimeout(() => {
-            successMessage.classList.add('hidden');
-        }, 3000);
+        if (successMessage && successText) {
+            successText.textContent = message;
+            successMessage.classList.remove('hidden');
+            
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 3000);
+        }
     }
 };
 
 // Inicializar la aplicación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado, inicializando controlador...');
     DashboardController.init();
 });

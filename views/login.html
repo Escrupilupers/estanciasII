@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIPOLI - Iniciar Sesión</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">UNIPOLI</div>
+            <div class="university-name">Universidad Politécnica de Durango</div>
+        </div>
+        <div class="right-panel">
+            <h1 class="welcome">Welcome Back</h1>
+            <p class="subtitle">Sign in to continue</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Institutional Email</label>
+                    <input type="email" id="email" value="a.flores.isw@uniautonomadgo.edu.mx" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink">Forgot a password?</a>
+                </div>
+                
+                <button type="submit" class="btn">Sign In</button>
+            </form>
+            
+            <div class="create-account">
+                Don't have an account? <a href="#" id="createAccountLink">Create new account</a>
+            </div>
+            
+            <div class="privacy-policy">
+                Privacy Policy
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/login.js"></script>
+</body>
+</html>
