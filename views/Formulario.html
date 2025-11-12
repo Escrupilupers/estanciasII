@@ -4,672 +4,287 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Programación de Prácticas</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#206cdf",
-                        "secondary": "#10b981",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#111721",
-                    },
-                    fontFamily: {
-                        "display": ["Public Sans"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Public Sans', sans-serif;
-        }
-        .form-section {
-            transition: all 0.3s ease;
-        }
-        .form-section:hover {
-            transform: translateY(-2px);
-        }
-        .step-indicator {
-            transition: all 0.3s ease;
-        }
-        .step-indicator.active {
-            background-color: #206cdf;
-            color: white;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .schedule-cell {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .schedule-cell:hover {
-            transform: scale(1.05);
-        }
-        .schedule-cell.occupied {
-            background-color: #ef4444;
-            color: white;
-        }
-        .schedule-cell.selected {
-            background-color: #10b981;
-            color: white;
-        }
-        .schedule-cell.available {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .time-slot {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/formulario.css">
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display">
-    <div class="min-h-screen py-8 px-4">
-        <!-- Header -->
-        <header class="max-w-7xl mx-auto mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex items-center gap-3 mb-4 md:mb-0">
-                        <div class="p-3 bg-primary rounded-xl">
-                            <i class="fas fa-graduation-cap text-white text-2xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Sistema Universitario</h1>
-                            <p class="text-gray-600 dark:text-gray-400">Programación de Prácticas Mensuales</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <button id="theme-toggle" class="p-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                            <i class="fas fa-moon" id="theme-icon"></i>
-                        </button>
-                        <a href="tabla.html" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                            <i class="fas fa-table"></i>
-                            Ver Tabla
-                        </a>
-                    </div>
+<body>
+    <!-- HEADER MEJORADO - CON IMAGEN -->
+    <div class="header-container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <img src="../assets/img/logo2.jpg" alt="UNIPOLI Logo" class="logo-img">
                 </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto">
-            <!-- Progress Steps -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-                <div class="flex justify-between items-center">
-                    <div class="step-indicator active w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-primary text-white">
-                        1
-                    </div>
-                    <div class="flex-1 h-1 bg-gray-200 dark:bg-gray-700 mx-2"></div>
-                    <div class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-                        2
-                    </div>
-                    <div class="flex-1 h-1 bg-gray-200 dark:bg-gray-700 mx-2"></div>
-                    <div class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-                        3
-                    </div>
+                <div class="university-name">
+                    <div class="university-line1">Universidad Politécnica de Durango</div>
                 </div>
-                <div class="flex justify-between mt-2 text-sm">
-                    <div class="text-primary font-medium">Información Básica</div>
-                    <div class="text-gray-500 dark:text-gray-400">Horario y Detalles</div>
-                    <div class="text-gray-500 dark:text-gray-400">Confirmación</div>
-                </div>
-            </div>
-
-            <!-- Form Container -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                <form id="practice-form" class="p-0">
-                    <!-- Step 1: Basic Information -->
-                    <div class="form-section p-8 border-b border-gray-200 dark:border-gray-700 fade-in">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                            <i class="fas fa-info-circle text-primary"></i>
-                            Información Básica
-                        </h2>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Asignatura <span class="text-red-500">*</span>
-                                </label>
-                                <select id="subject" name="subject" required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                                    <option value="">Seleccione una asignatura</option>
-                                    <option value="Química Orgánica">Química Orgánica</option>
-                                    <option value="Física I">Física I</option>
-                                    <option value="Biología Celular">Biología Celular</option>
-                                    <option value="Algoritmos">Algoritmos</option>
-                                    <option value="Electrónica Digital">Electrónica Digital</option>
-                                    <option value="Cálculo I">Cálculo I</option>
-                                    <option value="Química Analítica">Química Analítica</option>
-                                    <option value="Física II">Física II</option>
-                                    <option value="Genética">Genética</option>
-                                    <option value="Estructuras de Datos">Estructuras de Datos</option>
-                                    <option value="Electrónica Analógica">Electrónica Analógica</option>
-                                    <option value="Cálculo II">Cálculo II</option>
-                                    <option value="Microbiología">Microbiología</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label for="professor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Profesor <span class="text-red-500">*</span>
-                                </label>
-                                <select id="professor" name="professor" required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                                    <option value="">Seleccione un profesor</option>
-                                    <option value="Dr. García">Dr. García</option>
-                                    <option value="Dra. Martínez">Dra. Martínez</option>
-                                    <option value="Dr. Rodríguez">Dr. Rodríguez</option>
-                                    <option value="Dr. López">Dr. López</option>
-                                    <option value="Dr. Hernández">Dr. Hernández</option>
-                                    <option value="Dra. Pérez">Dra. Pérez</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label for="practice-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Fecha de Práctica <span class="text-red-500">*</span>
-                                </label>
-                                <input type="date" id="practice-date" name="practice-date" required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                            </div>
-                            
-                            <div>
-                                <label for="practice-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Nombre de Práctica <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="practice-name" name="practice-name" required placeholder="Ej: Laboratorio de Química"
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end mt-8">
-                            <button type="button" id="next-step-1" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                Siguiente
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Step 2: Schedule and Details -->
-                    <div class="form-section p-8 border-b border-gray-200 dark:border-gray-700 hidden fade-in">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                            <i class="fas fa-clock text-primary"></i>
-                            Horario y Detalles
-                        </h2>
-                        
-                        <!-- Weekly Schedule -->
-                        <div class="mb-8">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Agenda Semanal</h3>
-                                <div class="flex items-center gap-4 text-sm">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-4 bg-red-500 rounded"></div>
-                                        <span class="text-gray-600 dark:text-gray-400">Ocupado</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-4 bg-green-500 rounded"></div>
-                                        <span class="text-gray-600 dark:text-gray-400">Disponible</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-4 h-4 bg-secondary rounded"></div>
-                                        <span class="text-gray-600 dark:text-gray-400">Seleccionado</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 overflow-x-auto">
-                                <table class="w-full border-collapse">
-                                    <thead>
-                                        <tr>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Hora/Día</th>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Lunes</th>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Martes</th>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Miércoles</th>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Jueves</th>
-                                            <th class="p-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium">Viernes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="schedule-body">
-                                        <!-- Las horas se generarán dinámicamente con JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                                <p>Seleccione los horarios para su práctica. Las horas ocupadas se muestran en rojo.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <label for="objective" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Objetivo de la Práctica <span class="text-red-500">*</span>
-                            </label>
-                            <textarea id="objective" name="objective" required rows="4" placeholder="Describa el objetivo principal de esta práctica..."
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors"></textarea>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Duración (horas) <span class="text-red-500">*</span>
-                                </label>
-                                <select id="duration" name="duration" required
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                                    <option value="1">1 hora</option>
-                                    <option value="2" selected>2 horas</option>
-                                    <option value="3">3 horas</option>
-                                    <option value="4">4 horas</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label for="lab-room" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Laboratorio / Aula
-                                </label>
-                                <input type="text" id="lab-room" name="lab-room" placeholder="Ej: Laboratorio 3A"
-                                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white transition-colors">
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Materiales Requeridos
-                            </label>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="material-1" name="materials" value="Microscopio" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <label for="material-1" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Microscopio</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="material-2" name="materials" value="Reactivos químicos" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <label for="material-2" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Reactivos químicos</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="material-3" name="materials" value="Equipo de seguridad" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <label for="material-3" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Equipo de seguridad</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="material-4" name="materials" value="Computadoras" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                                    <label for="material-4" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Computadoras</label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between mt-8">
-                            <button type="button" id="prev-step-2" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
-                                <i class="fas fa-arrow-left"></i>
-                                Anterior
-                            </button>
-                            <button type="button" id="next-step-2" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                Siguiente
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Step 3: Confirmation -->
-                    <div class="form-section p-8 hidden fade-in">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                            <i class="fas fa-check-circle text-primary"></i>
-                            Confirmación
-                        </h2>
-                        
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Resumen de la Práctica</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Asignatura:</p>
-                                    <p id="summary-subject" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Profesor:</p>
-                                    <p id="summary-professor" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Fecha:</p>
-                                    <p id="summary-date" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Práctica:</p>
-                                    <p id="summary-practice" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Duración:</p>
-                                    <p id="summary-duration" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Laboratorio:</p>
-                                    <p id="summary-lab" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Horarios seleccionados:</p>
-                                    <p id="summary-schedule" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">Objetivo:</p>
-                                    <p id="summary-objective" class="font-medium text-gray-800 dark:text-white">-</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-between">
-                            <button type="button" id="prev-step-3" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center gap-2">
-                                <i class="fas fa-arrow-left"></i>
-                                Anterior
-                            </button>
-                            <button type="submit" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2">
-                                <i class="fas fa-save"></i>
-                                Guardar Práctica
-                            </button>
-                        </div>
-                    </div>
-                </form>
             </div>
             
-            <!-- Success Message -->
-            <div id="success-message" class="mt-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg hidden fade-in">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                    <span>¡Práctica guardada exitosamente!</span>
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <a href="usuario.html" style="text-decoration: none;">
+                        <div class="user-initials">
+                            DG
+                        </div>
+                    </a>
+                </div>
+                <div class="user-name">
+                    Dr. Garcia
+                </div>
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
-        </main>
+        </div>
+        
+        <!-- MENÚ MÓVIL SIMPLIFICADO -->
+        <div class="mobile-menu" id="mobile-menu">
+            <!-- Información del usuario en el menú móvil -->
+            <div class="mobile-user-info">
+                <div class="mobile-user-image">
+                    <div class="user-initials">
+                        DG
+                    </div>
+                </div>
+                <div class="mobile-user-details">
+                    <div class="mobile-user-name">Dr. Garcia</div>
+                    <div class="mobile-user-role">Profesor</div>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-item" onclick="mostrarPerfil()">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </div>
+            <div class="mobile-menu-item cerrar-sesion" onclick="cerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </div>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const form = document.getElementById('practice-form');
-            const steps = document.querySelectorAll('.form-section');
-            const stepIndicators = document.querySelectorAll('.step-indicator');
-            const nextStep1Btn = document.getElementById('next-step-1');
-            const nextStep2Btn = document.getElementById('next-step-2');
-            const prevStep2Btn = document.getElementById('prev-step-2');
-            const prevStep3Btn = document.getElementById('prev-step-3');
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = document.getElementById('theme-icon');
-            const successMessage = document.getElementById('success-message');
-            const scheduleBody = document.getElementById('schedule-body');
-            
-            // Summary elements
-            const summarySubject = document.getElementById('summary-subject');
-            const summaryProfessor = document.getElementById('summary-professor');
-            const summaryDate = document.getElementById('summary-date');
-            const summaryPractice = document.getElementById('summary-practice');
-            const summaryObjective = document.getElementById('summary-objective');
-            const summaryDuration = document.getElementById('summary-duration');
-            const summaryLab = document.getElementById('summary-lab');
-            const summarySchedule = document.getElementById('summary-schedule');
-            
-            let currentStep = 0;
-            let selectedTimeSlots = [];
-            let occupiedSlots = [];
-            
-            // Initialize theme
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.documentElement.classList.add('dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            }
-            
-            // Generate schedule
-            function generateSchedule() {
-                scheduleBody.innerHTML = '';
-                const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    <div class="container">
+        <!-- SYSTEM INFO EN LA MISMA SECCIÓN -->
+        <div class="system-section">
+            <div class="titulo-sistema">
+                <h2>Sistema Universitario</h2>
+                <p>Programación de prácticas de laboratorio</p>
+            </div>
+            <!-- PROGRESS STEPS -->
+            <div class="steps">
+                <div class="step active" data-step="1">1</div>
+                <div class="line" id="line-1"></div>
+                <div class="step" data-step="2">2</div>
+                <div class="line" id="line-2"></div>
+                <div class="step" data-step="3">3</div>
+            </div>
+            <div class="step-labels">
+                <div class="step-label active">Información Básica</div>
+                <div class="step-label">Horario y Detalles</div>
+                <div class="step-label">Confirmación</div>
+            </div>
+        </div>
+
+        <!-- FORM CONTAINER -->
+        <div class="form-container">
+            <!-- Paso 1: Información Básica -->
+            <div class="form-section active" id="section-1">
+                <h2 class="section-title"><i class="fas fa-info-circle"></i> Información Básica</h2>
                 
-                // Generate time slots from 7:00 to 20:00 (8:00 PM)
-                for (let hour = 7; hour <= 20; hour++) {
-                    const row = document.createElement('tr');
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="subject" class="required">Asignatura</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Seleccione una asignatura</option>
+                            <option value="Química Orgánica">Química Orgánica</option>
+                            <option value="Física I">Física I</option>
+                            <option value="Biología Celular">Biología Celular</option>
+                            <option value="Algoritmos">Algoritmos</option>
+                            <option value="Electrónica Digital">Electrónica Digital</option>
+                            <option value="Cálculo I">Cálculo I</option>
+                            <option value="Química Analítica">Química Analítica</option>
+                            <option value="Física II">Física II</option>
+                            <option value="Genética">Genética</option>
+                            <option value="Estructuras de Datos">Estructuras de Datos</option>
+                            <option value="Electrónica Analógica">Electrónica Analógica</option>
+                            <option value="Cálculo II">Cálculo II</option>
+                            <option value="Microbiología">Microbiología</option>
+                        </select>
+                        <div class="error-message">Este campo es obligatorio</div>
+                    </div>
                     
-                    // Time cell
-                    const timeCell = document.createElement('td');
-                    timeCell.className = 'p-2 border border-gray-300 dark:border-gray-600 text-center text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300';
-                    timeCell.textContent = `${hour}:00 - ${hour + 1}:00`;
-                    row.appendChild(timeCell);
+                    <div class="form-group">
+                        <label for="professor" class="required">Profesor</label>
+                        <select id="professor" name="professor" required>
+                            <option value="">Seleccione un profesor</option>
+                            <option value="Dr. García">Dr. García</option>
+                            <option value="Dra. Martínez">Dra. Martínez</option>
+                            <option value="Dr. Rodríguez">Dr. Rodríguez</option>
+                            <option value="Dr. López">Dr. López</option>
+                            <option value="Dr. Hernández">Dr. Hernández</option>
+                            <option value="Dra. Pérez">Dra. Pérez</option>
+                        </select>
+                        <div class="error-message">Este campo es obligatorio</div>
+                    </div>
                     
-                    // Day cells
-                    days.forEach(day => {
-                        const dayCell = document.createElement('td');
-                        dayCell.className = 'p-1 border border-gray-300 dark:border-gray-600';
-                        
-                        const slotDiv = document.createElement('div');
-                        slotDiv.className = 'schedule-cell time-slot rounded';
-                        slotDiv.dataset.day = day;
-                        slotDiv.dataset.hour = hour;
-                        
-                        // Mark some slots as occupied (for demonstration)
-                        const isOccupied = Math.random() < 0.3; // 30% chance of being occupied
-                        if (isOccupied) {
-                            slotDiv.classList.add('occupied');
-                            slotDiv.innerHTML = '<i class="fas fa-ban"></i>';
-                            occupiedSlots.push(`${day}-${hour}`);
-                        } else {
-                            slotDiv.classList.add('available');
-                            slotDiv.innerHTML = '<i class="fas fa-check"></i>';
-                        }
-                        
-                        slotDiv.addEventListener('click', function() {
-                            toggleTimeSlot(this);
-                        });
-                        
-                        dayCell.appendChild(slotDiv);
-                        row.appendChild(dayCell);
-                    });
+                    <div class="form-group">
+                        <label for="practice-date" class="required">Fecha de Práctica</label>
+                        <input type="date" id="practice-date" name="practice-date" required>
+                        <div class="error-message">Seleccione una fecha válida</div>
+                    </div>
                     
-                    scheduleBody.appendChild(row);
-                }
-            }
+                    <div class="form-group">
+                        <label for="practice-name" class="required">Nombre de Práctica</label>
+                        <input type="text" id="practice-name" name="practice-name" required placeholder="Ej: Laboratorio de Química">
+                        <div class="error-message">Este campo es obligatorio</div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <div></div> <!-- Espacio vacío para alinear el botón a la derecha -->
+                    <button type="button" class="btn next" id="next1">Siguiente <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
             
-            // Toggle time slot selection
-            function toggleTimeSlot(element) {
-                const day = element.dataset.day;
-                const hour = parseInt(element.dataset.hour);
-                const slotKey = `${day}-${hour}`;
+            <!-- Paso 2: Horario y Detalles -->
+            <div class="form-section" id="section-2">
+                <h2 class="section-title"><i class="fas fa-clock"></i> Horario y Detalles</h2>
                 
-                // Check if slot is occupied
-                if (occupiedSlots.includes(slotKey)) {
-                    return; // Can't select occupied slots
-                }
-                
-                // Toggle selection
-                if (element.classList.contains('selected')) {
-                    element.classList.remove('selected');
-                    element.classList.add('available');
-                    element.innerHTML = '<i class="fas fa-check"></i>';
+                <!-- Weekly Schedule - MANTENIENDO DISEÑO ORIGINAL -->
+                <div class="schedule-container">
+                    <div class="schedule-header">
+                        <h3>Agenda Semanal</h3>
+                        <div class="schedule-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #fecaca;"></div>
+                                <span>Ocupado</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #d1fae5;"></div>
+                                <span>Disponible</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: #9BD86B;"></div>
+                                <span>Seleccionado</span>
+                            </div>
+                        </div>
+                    </div>
                     
-                    // Remove from selected slots
-                    selectedTimeSlots = selectedTimeSlots.filter(slot => slot !== slotKey);
-                } else {
-                    element.classList.remove('available');
-                    element.classList.add('selected');
-                    element.innerHTML = '<i class="fas fa-calendar-check"></i>';
+                    <div class="schedule-wrapper">
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>Hora/Día</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-body">
+                                <!-- Las celdas se generarán con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    // Add to selected slots
-                    selectedTimeSlots.push(slotKey);
-                }
+                    <div class="selected-slots-container" id="selected-slots">
+                        <h4>Horarios seleccionados:</h4>
+                        <div id="selected-slots-list"></div>
+                    </div>
+                    
+                    <div class="schedule-info">
+                        <p>Seleccione los horarios para su práctica. Las horas ocupadas se muestran en rojo.</p>
+                    </div>
+                </div>
                 
-                // Update duration based on selected slots
-                updateDurationFromSelection();
-            }
+                <div class="form-group">
+                    <label for="objective" class="required">Objetivo de la Práctica</label>
+                    <textarea id="objective" name="objective" required rows="4" placeholder="Describa el objetivo principal de esta práctica..."></textarea>
+                    <div class="error-message">Este campo es obligatorio</div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="duration" class="required">Duración (horas)</label>
+                        <select id="duration" name="duration" required>
+                            <option value="1">1 hora</option>
+                            <option value="2" selected>2 horas</option>
+                            <option value="3">3 horas</option>
+                            <option value="4">4 horas</option>
+                        </select>
+                        <div class="error-message">Seleccione una duración</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lab-room">Laboratorio / Aula</label>
+                        <input type="text" id="lab-room" name="lab-room" placeholder="Ej: Laboratorio 3A">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn prev" id="prev2"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button type="button" class="btn next" id="next2">Siguiente <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
             
-            // Update duration based on selected time slots
-            function updateDurationFromSelection() {
-                const durationSelect = document.getElementById('duration');
-                durationSelect.value = selectedTimeSlots.length;
-            }
-            
-            // Step navigation
-            function showStep(stepIndex) {
-                steps.forEach((step, index) => {
-                    if (index === stepIndex) {
-                        step.classList.remove('hidden');
-                        step.classList.add('fade-in');
-                    } else {
-                        step.classList.add('hidden');
-                    }
-                });
+            <!-- Paso 3: Confirmación -->
+            <div class="form-section" id="section-3">
+                <h2 class="section-title"><i class="fas fa-check-circle"></i> Confirmación</h2>
                 
-                stepIndicators.forEach((indicator, index) => {
-                    if (index <= stepIndex) {
-                        indicator.classList.add('active');
-                    } else {
-                        indicator.classList.remove('active');
-                    }
-                });
+                <div class="confirmation-container">
+                    <h3 class="confirmation-title">Resumen de la Práctica</h3>
+                    
+                    <div class="confirmation-grid">
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Asignatura:</div>
+                            <div class="confirmation-value" id="summary-subject">-</div>
+                        </div>
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Profesor:</div>
+                            <div class="confirmation-value" id="summary-professor">-</div>
+                        </div>
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Fecha:</div>
+                            <div class="confirmation-value" id="summary-date">-</div>
+                        </div>
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Práctica:</div>
+                            <div class="confirmation-value" id="summary-practice">-</div>
+                        </div>
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Duración:</div>
+                            <div class="confirmation-value" id="summary-duration">-</div>
+                        </div>
+                        <div class="confirmation-item">
+                            <div class="confirmation-label">Laboratorio:</div>
+                            <div class="confirmation-value" id="summary-lab">-</div>
+                        </div>
+                        <div class="confirmation-item full-width">
+                            <div class="confirmation-label">Horarios seleccionados:</div>
+                            <div class="confirmation-value" id="summary-schedule">-</div>
+                        </div>
+                        <div class="confirmation-item full-width">
+                            <div class="confirmation-label">Objetivo:</div>
+                            <div class="confirmation-value" id="summary-objective">-</div>
+                        </div>
+                    </div>
+                </div>
                 
-                currentStep = stepIndex;
+                <div class="form-actions">
+                    <button type="button" class="btn prev" id="prev3"><i class="fas fa-arrow-left"></i> Anterior</button>
+                    <button type="submit" class="btn submit" id="submit-form"><i class="fas fa-save"></i> Guardar Práctica</button>
+                </div>
                 
-                // Generate schedule when showing step 2
-                if (stepIndex === 1) {
-                    generateSchedule();
-                }
-            }
-            
-            // Next step 1
-            nextStep1Btn.addEventListener('click', function() {
-                // Validate step 1
-                const subject = document.getElementById('subject').value;
-                const professor = document.getElementById('professor').value;
-                const practiceDate = document.getElementById('practice-date').value;
-                const practiceName = document.getElementById('practice-name').value;
-                
-                if (!subject || !professor || !practiceDate || !practiceName) {
-                    alert('Por favor, complete todos los campos obligatorios.');
-                    return;
-                }
-                
-                showStep(1);
-            });
-            
-            // Next step 2
-            nextStep2Btn.addEventListener('click', function() {
-                // Validate step 2
-                const objective = document.getElementById('objective').value;
-                
-                if (!objective) {
-                    alert('Por favor, complete el objetivo de la práctica.');
-                    return;
-                }
-                
-                if (selectedTimeSlots.length === 0) {
-                    alert('Por favor, seleccione al menos un horario para la práctica.');
-                    return;
-                }
-                
-                // Update summary
-                updateSummary();
-                showStep(2);
-            });
-            
-            // Previous step 2
-            prevStep2Btn.addEventListener('click', function() {
-                showStep(0);
-            });
-            
-            // Previous step 3
-            prevStep3Btn.addEventListener('click', function() {
-                showStep(1);
-            });
-            
-            // Update summary
-            function updateSummary() {
-                summarySubject.textContent = document.getElementById('subject').value;
-                summaryProfessor.textContent = document.getElementById('professor').value;
-                
-                const date = new Date(document.getElementById('practice-date').value);
-                summaryDate.textContent = date.toLocaleDateString('es-ES');
-                
-                summaryPractice.textContent = document.getElementById('practice-name').value;
-                summaryObjective.textContent = document.getElementById('objective').value;
-                summaryDuration.textContent = `${document.getElementById('duration').value} hora(s)`;
-                summaryLab.textContent = document.getElementById('lab-room').value || 'No especificado';
-                
-                // Format selected time slots
-                const formattedSlots = selectedTimeSlots.map(slot => {
-                    const [day, hour] = slot.split('-');
-                    return `${day} ${hour}:00-${parseInt(hour) + 1}:00`;
-                });
-                summarySchedule.textContent = formattedSlots.join(', ');
-            }
-            
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form data
-                const formData = {
-                    subject: document.getElementById('subject').value,
-                    professor: document.getElementById('professor').value,
-                    date: document.getElementById('practice-date').value,
-                    practice: document.getElementById('practice-name').value,
-                    objective: document.getElementById('objective').value,
-                    duration: document.getElementById('duration').value,
-                    labRoom: document.getElementById('lab-room').value,
-                    schedule: selectedTimeSlots,
-                    materials: Array.from(document.querySelectorAll('input[name="materials"]:checked')).map(cb => cb.value)
-                };
-                
-                // Save to localStorage (simulating database)
-                let practices = JSON.parse(localStorage.getItem('practices')) || [];
-                practices.push(formData);
-                localStorage.setItem('practices', JSON.stringify(practices));
-                
-                // Show success message
-                successMessage.classList.remove('hidden');
-                
-                // Reset form
-                form.reset();
-                selectedTimeSlots = [];
-                showStep(0);
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    successMessage.classList.add('hidden');
-                }, 5000);
-            });
-            
-            // Theme toggle
-            themeToggle.addEventListener('click', function() {
-                document.documentElement.classList.toggle('dark');
-                const isDark = document.documentElement.classList.contains('dark');
-                localStorage.setItem('darkMode', isDark);
-                
-                if (isDark) {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                } else {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
-            });
-            
-            // Set minimum date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('practice-date').setAttribute('min', today);
-        });
-    </script>
+                <div class="success-message" id="success-message">
+                    <i class="fas fa-check-circle"></i> ¡Práctica guardada exitosamente!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/formulario.js"></script>
 </body>
 </html>
