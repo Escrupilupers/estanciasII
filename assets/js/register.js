@@ -110,7 +110,7 @@ form.addEventListener('submit', async (e) => {
       </div>
     `;
     setTimeout(() => {
-      window.location.href = "/login.html";
+      window.location.href = "/views/login.html";
     }, 3000);
 
   } catch (error) {

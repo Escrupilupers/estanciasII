@@ -14,36 +14,62 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.classList.toggle('bi-eye-slash');
 });
 
-// Validación del formulario
+// Validación del formulario + LOGIN REAL
 const form = document.getElementById('loginForm');
 const alerta = document.getElementById('alerta');
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const email = document.getElementById('email').value.trim();
   const password = passwordInput.value;
 
+  // Validación básica
   if (!email || !password) {
     showAlert("Please fill in all fields.");
     return;
   }
 
-  if (!email.endsWith("@uniautonomadgo.edu.mx")) {
+  if (!email.endsWith("@unipolidgo.edu.mx")) {
     showAlert("Use your institutional email.");
     return;
   }
 
-  // Simulación de éxito
-  alerta.style.display = 'none';
-  form.innerHTML = `
-    <div style="padding: 20px; text-align:center;">
-      <i class="bi bi-check-circle-fill text-success" style="font-size: 60px;"></i>
-      <h5 class="mt-3">Welcome, ${email.split('@')[0]}!</h5>
-      <p>Redirecting to dashboard...</p>
-    </div>
-  `;
+  try {
+    // 🔥 Request al backend
+    const response = await fetch("http://localhost:3000/api/usuarios/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-  setTimeout(() => location.reload(), 2000);
+    const data = await response.json();
+
+    // ❌ SI EL BACKEND RESPONDE ERROR
+    if (!response.ok) {
+      showAlert(data.error || "Login failed.");
+      return;
+    }
+
+    // ✔️ LOGIN EXITOSO → animación
+    alerta.style.display = 'none';
+    form.innerHTML = `
+      <div style="padding: 20px; text-align:center;">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 60px;"></i>
+        <h5 class="mt-3">Welcome, ${data.usuario.nombre}!</h5>
+        <p>Redirecting to dashboard...</p>
+      </div>
+    `;
+
+    // 🔥 REDIRECCIÓN REAL
+    setTimeout(() => {
+      window.location.href = "dash.html";
+    }, 1500);
+
+  } catch (err) {
+    console.error("Login error:", err);
+    showAlert("Server connection error.");
+  }
 });
 
 function showAlert(msg) {
