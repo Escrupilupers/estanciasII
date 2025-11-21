@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Universitario</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#9BD86B",
+                        "secondary": "#10b981",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111721",
+                        "new-practice": "#9BD86B"
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        
+        /* HEADER */
+        .header-container {
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .dark .header-container {
+            background-color: #1f2937;
+            border-bottom: 1px solid #374151;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .university-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #003300;
+            line-height: 1.2;
+        }
+        
+        .dark .university-name {
+            color: #ffffff;
+        }
+
+        .university-line1 {
+            font-size: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-image-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-initials {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #9BD86B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-initials:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .dark .user-name {
+            color: #f9fafb;
+        }
+
+        /* MENÚ HAMBURGUESA */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: #333;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .dark .hamburger-menu span {
+            background-color: #f9fafb;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1001;
+            padding: 15px;
+            width: 250px;
+            border-radius: 0 0 0 8px;
+        }
+        
+        .dark .mobile-menu {
+            background-color: #1f2937;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        /* Información del usuario en menú móvil */
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        
+        .dark .mobile-user-info {
+            border-bottom: 1px solid #374151;
+        }
+
+        .mobile-user-image {
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .dark .mobile-user-name {
+            color: #f9fafb;
+        }
+
+        .mobile-user-role {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .dark .mobile-user-role {
+            color: #d1d5db;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .dark .mobile-menu-item {
+            border-bottom: 1px solid #374151;
+            color: #f9fafb;
+        }
+
+        .mobile-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-menu-item i {
+            color: #9BD86B;
+            width: 20px;
+        }
+
+        .mobile-menu-item:hover {
+            background-color: #f5f5f5;
+            padding-left: 10px;
+            border-radius: 4px;
+        }
+        
+        .dark .mobile-menu-item:hover {
+            background-color: #374151;
+        }
+
+        .mobile-menu-item.cerrar-sesion {
+            color: #e74c3c;
+        }
+
+        .mobile-menu-item.cerrar-sesion i {
+            color: #e74c3c;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 15px;
+            }
+            
+            .logo-img {
+                height: 40px;
+            }
+            
+            .university-name {
+                font-size: 14px;
+            }
+            
+            .university-line1 {
+                font-size: 14px;
+            }
+            
+            .user-image-container {
+                display: none !important;
+            }
+            
+            .user-name {
+                display: none !important;
+            }
+            
+            .hamburger-menu {
+                display: flex !important;
+            }
+            
+            .user-profile {
+                gap: 0;
+                justify-content: flex-end;
+            }
+        }
+
+        /* Media query adicional para pantallas muy pequeñas */
+        @media (max-width: 480px) {
+            .header-left {
+                gap: 10px;
+            }
+            
+            .university-name {
+                font-size: 12px;
+            }
+            
+            .university-line1 {
+                font-size: 12px;
+            }
+            
+            .hamburger-menu {
+                width: 25px;
+                height: 18px;
+            }
+            
+            .mobile-menu {
+                width: 220px;
+            }
+            
+            .mobile-user-info {
+                gap: 10px;
+                padding: 12px 0;
+            }
+            
+            .mobile-user-name {
+                font-size: 14px;
+            }
+            
+            .mobile-user-role {
+                font-size: 12px;
+            }
+        }
+
+        /* Estilos para el dashboard */
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Estilos para el botón de cerrar sesión en el sidebar */
+        .logout-sidebar {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 0 16px;
+        }
+        
+        .logout-sidebar .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #e74c3c !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .logout-sidebar .logout-link:hover {
+            background-color: #fee2e2;
+        }
+        
+        .dark .logout-sidebar .logout-link:hover {
+            background-color: #7f1d1d;
+        }
+        
+        .logout-sidebar .logout-link i {
+            color: #e74c3c !important;
+        }
+        
+        /* Asegurar que el sidebar tenga posición relativa para el posicionamiento absoluto del logout */
+        .sidebar-container {
+            position: relative;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <!-- HEADER -->
+    <div class="header-container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <img src="https://via.placeholder.com/50x50/9BD86B/FFFFFF?text=U" alt="UNIPOLI Logo" class="logo-img">
+                </div>
+                <div class="university-name">
+                    <div class="university-line1" data-i18n="university.line1">Universidad Politécnica de</div>
+                    <div class="university-line1" data-i18n="university.line2">Durango</div>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-image-container">
+                    <div class="user-initials" id="user-initials-btn">
+                        A
+                    </div>
+                </div>
+                <div class="user-name" data-i18n="header.admin">Administrador</div>
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MENÚ MÓVIL -->
+        <div class="mobile-menu" id="mobile-menu">
+            <!-- Información del usuario en el menú móvil -->
+            <div class="mobile-user-info">
+                <div class="mobile-user-image">
+                    <div class="user-initials">
+                        A
+                    </div>
+                </div>
+                <div class="mobile-user-details">
+                    <div class="mobile-user-name" data-i18n="header.admin">Administrador</div>
+                    <div class="mobile-user-role" data-i18n="header.admin">Administrador</div>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-item" onclick="mostrarPerfil()">
+                <i class="fas fa-user"></i>
+                <span data-i18n="menu.profile">Perfil</span>
+            </div>
+            <div class="mobile-menu-item cerrar-sesion" onclick="abrirModalCerrarSesion()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-i18n="menu.logout">Cerrar Sesión</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex pt-16">
+        <!-- Desktop Sidebar -->
+        <div class="sidebar hidden md:block w-64 bg-white dark:bg-gray-800 fixed top-16 left-0 h-[calc(100vh-4rem)] shadow-md border-r border-gray-200 dark:border-gray-700 overflow-y-auto z-30 sidebar-container">
+            <div class="p-4 h-full flex flex-col">
+                <div class="flex-1">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" id="dashboard-link" class="flex items-center gap-3 p-3 rounded-lg bg-primary text-white">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span data-i18n="menu.dashboard">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="practices-link" class="flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-laptop-code"></i>
+                                <span data-i18n="menu.practices">Prácticas</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="agenda-link" class="flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span data-i18n="menu.agenda">Agenda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="users-link" class="flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-users"></i>
+                                <span data-i18n="menu.users">Usuarios</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="reports-link" class="flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-chart-bar"></i>
+                                <span data-i18n="menu.reports">Reportes</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="settings-link" class="flex items-center gap-3 p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <i class="fas fa-cog"></i>
+                                <span data-i18n="menu.settings">Configuración</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Botón Cerrar Sesión en color rojo -->
+                <div class="logout-sidebar">
+                    <a href="#" id="logout-link" class="logout-link" onclick="abrirModalCerrarSesion()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span data-i18n="menu.logout">Cerrar Sesión</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6 md:ml-64 mt-0">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="fade-in">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6" data-i18n="dashboard.title">Dashboard de Administración</h1>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400" data-i18n="dashboard.totalPractices">Total Prácticas</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="total-practices">0</p>
+                            </div>
+                             <div class="p-3 rounded-lg" style="background-color: #AED5F5;">
+                                <i class="fas fa-laptop-code text-blue-600 text-2xl"></i>
+                            </div>
+
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span data-i18n="dashboard.stats.increase">12% más que el mes pasado</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400" data-i18n="dashboard.monthPractices">Prácticas Este Mes</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="month-practices">0</p>
+                            </div>
+                            <div class="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                                <i class="fas fa-calendar-check text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span data-i18n="dashboard.stats.weeklyIncrease">5% más que la semana pasada</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400" data-i18n="dashboard.professors">Profesores</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="total-professors">0</p>
+                            </div>
+                            <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                                <i class="fas fa-user-tie text-purple-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <span data-i18n="dashboard.stats.noChanges">Sin cambios</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400" data-i18n="dashboard.subjects">Asignaturas</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="total-subjects">0</p>
+                            </div>
+                            <div class="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                                <i class="fas fa-book text-yellow-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm text-green-500">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span data-i18n="dashboard.stats.newThisMonth">2 nuevas este mes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activities and Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Recent Activities -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
+                        <div class="space-y-4" id="recent-activities">
+                            <!-- Las actividades se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Practices -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.upcomingPractices">Próximas Prácticas</h2>
+                        <div class="space-y-4" id="upcoming-practices">
+                            <!-- Las prácticas próximas se cargarán dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cerrar Sesión -->
+    <div id="logout-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden fade-in">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 slide-in">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white" data-i18n="menu.logout">Cerrar Sesión</h3>
+                    <button id="close-logout-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt text-blue-500 text-2xl"></i>
+                    </div>
+                </div>
+                <p class="text-center text-gray-600 dark:text-gray-300 mb-6" data-i18n="logout.confirmation">
+                    ¿Está seguro de que desea cerrar sesión?
+                </p>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <button id="cancel-logout" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" data-i18n="common.cancel">
+                        Cancelar
+                    </button>
+                    <button id="confirm-logout" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span data-i18n="menu.logout">Cerrar Sesión</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    <div id="success-message" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden fade-in">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-check-circle"></i>
+            <span id="success-text">¡Operación completada exitosamente!</span>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para el dashboard
+        let practiceData = [
+            { 
+                id: 1, 
+                date: '2024-01-15',
+                practice: 'Laboratorio MAC', 
+                professor: 'Dr. Fued', 
+                subject: 'Programación Concurrente', 
+                status: 'programada', 
+                time: '7:00',
+                objective: 'Programación de hilos en web.',
+                lab: 'Laboratorio 3A'
+            },
+            { 
+                id: 2, 
+                date: '2024-01-15',
+                practice: 'Laboratorio Linux', 
+                professor: 'Prof. Estefano', 
+                subject: 'Sistemas Operativos', 
+                status: 'confirmada', 
+                time: '9:00',
+                objective: 'Instalación de un sistema operativo dual.',
+                lab: 'Laboratorio 2B'
+            },
+            { 
+                id: 3, 
+                date: '2024-01-16',
+                practice: 'Laboratorio Windows', 
+                professor: 'Prof. Ricardo', 
+                subject: 'Programación I', 
+                status: 'en-curso', 
+                time: '11:00',
+                objective: 'Instalación de un sistema operativo dual.',
+                lab: 'Laboratorio 1C'
+            },
+            { 
+                id: 4, 
+                date: '2024-01-17',
+                practice: 'Laboratorio Windows', 
+                professor: 'Prof. Valeria', 
+                subject: 'Liderazgo eq. Alto desempeño', 
+                status: 'cancelada', 
+                time: '14:00',
+                objective: 'Examen de conocimientos.',
+                lab: 'Aula 4'
+            },
+            { 
+                id: 5, 
+                date: '2024-01-18',
+                practice: 'Laboratorio Windows', 
+                professor: 'Prof. Valeria', 
+                subject: 'Liderazgo eq. Alto desempeño', 
+                status: 'completada', 
+                time: '16:00',
+                objective: 'En cuesta de...',
+                lab: 'Aula 4'
+            }
+        ];
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar listeners para el modal de cerrar sesión
+            const closeLogoutModal = document.getElementById('close-logout-modal');
+            const cancelLogout = document.getElementById('cancel-logout');
+            const confirmLogout = document.getElementById('confirm-logout');
+            const logoutModal = document.getElementById('logout-modal');
+            
+            if (closeLogoutModal) {
+                closeLogoutModal.addEventListener('click', cerrarModalCerrarSesion);
+            }
+            if (cancelLogout) {
+                cancelLogout.addEventListener('click', cerrarModalCerrarSesion);
+            }
+            if (confirmLogout) {
+                confirmLogout.addEventListener('click', confirmarCerrarSesion);
+            }
+            if (logoutModal) {
+                logoutModal.addEventListener('click', function(e) {
+                    if (e.target === logoutModal) {
+                        cerrarModalCerrarSesion();
+                    }
+                });
+            }
+            
+            // Configurar menú hamburguesa
+            setupHeaderFunctionality();
+            
+            // Inicializar dashboard
+            initializeDashboard();
+            
+            // Configurar navegación
+            setupNavigation();
+        });
+
+        // Configurar funcionalidades del header
+        function setupHeaderFunctionality() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const userInitialsBtn = document.getElementById('user-initials-btn');
+
+            // Menú hamburguesa
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    hamburgerMenu.classList.toggle('active');
+                });
+                
+                // Cerrar menú al hacer clic fuera de él
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        mobileMenu.classList.remove('active');
+                        hamburgerMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Botón de iniciales del usuario
+            if (userInitialsBtn) {
+                userInitialsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mostrarPerfil();
+                });
+            }
+        }
+
+        // Configurar navegación
+        function setupNavigation() {
+            // Navegación del sidebar
+            document.getElementById('dashboard-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            document.getElementById('practices-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            document.getElementById('agenda-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            document.getElementById('users-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            document.getElementById('reports-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            document.getElementById('settings-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                updateActiveLink(this);
+            });
+            
+            // Botón Cerrar Sesión en sidebar
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                abrirModalCerrarSesion();
+            });
+        }
+
+        // Funciones para el modal de cerrar sesión
+        function abrirModalCerrarSesion() {
+            const modal = document.getElementById('logout-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function cerrarModalCerrarSesion() {
+            const modal = document.getElementById('logout-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function confirmarCerrarSesion() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                alert('Cerrando sesión...');
+                // window.location.href = 'login.html';
+                cerrarModalCerrarSesion();
+            }
+        }
+
+        // Función para mostrar perfil
+        function mostrarPerfil() {
+            alert('Perfil de usuario');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            if (mobileMenu) mobileMenu.classList.remove('active');
+            if (hamburgerMenu) hamburgerMenu.classList.remove('active');
+        }
+
+        // Hacer las funciones globales
+        window.mostrarPerfil = mostrarPerfil;
+        window.abrirModalCerrarSesion = abrirModalCerrarSesion;
+        window.cerrarModalCerrarSesion = cerrarModalCerrarSesion;
+        window.confirmarCerrarSesion = confirmarCerrarSesion;
+
+        // Inicializar dashboard
+        function initializeDashboard() {
+            updateDashboardStats();
+            loadRecentActivities();
+            loadUpcomingPractices();
+        }
+
+        // Actualizar estadísticas del dashboard
+        function updateDashboardStats() {
+            // Actualizar total de prácticas
+            document.getElementById('total-practices').textContent = practiceData.length;
+            
+            // Calcular prácticas del mes actual
+            const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            const monthPractices = practiceData.filter(practice => {
+                const practiceDate = new Date(practice.date);
+                return practiceDate.getMonth() + 1 === currentMonth && practiceDate.getFullYear() === currentYear;
+            }).length;
+            document.getElementById('month-practices').textContent = monthPractices;
+            
+            // Calcular número de profesores únicos
+            const professors = [...new Set(practiceData.map(item => item.professor))];
+            document.getElementById('total-professors').textContent = professors.length;
+            
+            // Calcular número de asignaturas únicas
+            const subjects = [...new Set(practiceData.map(item => item.subject))];
+            document.getElementById('total-subjects').textContent = subjects.length;
+        }
+
+        // Cargar actividades recientes
+        function loadRecentActivities() {
+            const activitiesContainer = document.getElementById('recent-activities');
+            activitiesContainer.innerHTML = '';
+            
+            // Ordenar prácticas por fecha (más recientes primero)
+            const sortedPractices = [...practiceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Tomar las 4 más recientes
+            const recentPractices = sortedPractices.slice(0, 4);
+            
+            recentPractices.forEach(practice => {
+                const activityDiv = document.createElement('div');
+                activityDiv.className = 'flex items-start gap-3';
+                
+                activityDiv.innerHTML = `
+                    <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+                        <i class="fas fa-plus text-primary"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white">Actividad Reciente</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${practice.practice} - ${practice.professor}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(practice.date)}</p>
+                    </div>
+                `;
+                
+                activitiesContainer.appendChild(activityDiv);
+            });
+        }
+
+        // Cargar próximas prácticas
+        function loadUpcomingPractices() {
+            const upcomingContainer = document.getElementById('upcoming-practices');
+            upcomingContainer.innerHTML = '';
+            
+            // Obtener fecha actual
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Filtrar prácticas futuras
+            const upcomingPractices = practiceData.filter(practice => {
+                const practiceDate = new Date(practice.date);
+                practiceDate.setHours(0, 0, 0, 0);
+                return practiceDate >= today;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Tomar las 4 próximas
+            const nextPractices = upcomingPractices.slice(0, 4);
+            
+            nextPractices.forEach(practice => {
+                const practiceDiv = document.createElement('div');
+                practiceDiv.className = 'flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg';
+                
+                practiceDiv.innerHTML = `
+                    <div>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white">${practice.practice}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">${practice.professor} - ${formatDate(practice.date)}</p>
+                    </div>
+                    <span class="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs rounded-full">Programada</span>
+                `;
+                
+                upcomingContainer.appendChild(practiceDiv);
+            });
+        }
+
+        // Actualizar enlace activo en el sidebar
+        function updateActiveLink(activeLink) {
+            // Remover clase activa de todos los enlaces
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.classList.remove('bg-primary', 'text-white');
+                link.classList.add('text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            });
+            
+            // Agregar clase activa al enlace seleccionado
+            activeLink.classList.remove('text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-100', 'dark:hover:bg-gray-700');
+            activeLink.classList.add('bg-primary', 'text-white');
+        }
+
+        // Formatear fecha
+        function formatDate(dateString) {
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+    </script>
+</body>
+</html>
