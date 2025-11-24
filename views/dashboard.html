@@ -38,7 +38,7 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display">
     <!-- HEADER CORREGIDO - AHORA ES FIXED -->
-    <div class="header-container">
+    <div class="header-container" id="header-container">
         <div class="header">
             <div class="header-left">
                 <div class="logo-container">
@@ -65,7 +65,7 @@
             </div>
         </div>
         
-        <!-- MENÚ MÓVIL SIMPLIFICADO -->
+        <!-- MENÚ MÓVIL MEJORADO - AHORA CON NAVEGACIÓN COMPLETA -->
         <div class="mobile-menu" id="mobile-menu">
             <!-- Información del usuario en el menú móvil -->
             <div class="mobile-user-info">
@@ -80,10 +80,34 @@
                 </div>
             </div>
             
-            <div class="mobile-menu-item" onclick="mostrarPerfil()">
-                <i class="fas fa-user"></i>
-                <span data-i18n="menu.profile">Perfil</span>
+            <!-- Navegación completa en menú móvil -->
+            <div class="mobile-menu-item" onclick="showView('dashboard-view'); closeMobileMenu();">
+                <i class="fas fa-tachometer-alt"></i>
+                <span data-i18n="menu.dashboard">Dashboard</span>
             </div>
+            <div class="mobile-menu-item" onclick="showView('practices-view'); closeMobileMenu();">
+                <i class="fas fa-laptop-code"></i>
+                <span data-i18n="menu.practices">Prácticas</span>
+            </div>
+            <div class="mobile-menu-item" onclick="showView('agenda-view'); closeMobileMenu();">
+                <i class="fas fa-calendar-alt"></i>
+                <span data-i18n="menu.agenda">Agenda</span>
+            </div>
+            <div class="mobile-menu-item" onclick="showView('users-view'); closeMobileMenu();">
+                <i class="fas fa-users"></i>
+                <span data-i18n="menu.users">Usuarios</span>
+            </div>
+            <div class="mobile-menu-item" onclick="showView('reports-view'); closeMobileMenu();">
+                <i class="fas fa-chart-bar"></i>
+                <span data-i18n="menu.reports">Reportes</span>
+            </div>
+            <div class="mobile-menu-item" onclick="showView('settings-view'); closeMobileMenu();">
+                <i class="fas fa-cog"></i>
+                <span data-i18n="menu.settings">Configuración</span>
+            </div>
+            
+            
+            <!-- Opciones de usuario - PERFIL ELIMINADO -->
             <div class="mobile-menu-item cerrar-sesion" onclick="abrirModalCerrarSesion()">
                 <i class="fas fa-sign-out-alt"></i>
                 <span data-i18n="menu.logout">Cerrar Sesión</span>
@@ -289,17 +313,19 @@
                     </div>
                 </div>
                 
-                <!-- Recent Activities and Charts -->
+                <!-- Recent Activities and Charts - NUEVO DISEÑO MEJORADO -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Recent Activities -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
-                        <div class="space-y-4" id="recent-activities">
+                    <!-- Recent Activities - NUEVO DISEÑO -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
+                        </div>
+                        <div class="space-y-4 flex-1" id="recent-activities">
                             <!-- Las actividades se cargarán dinámicamente -->
                         </div>
                     </div>
                     
-                    <!-- Upcoming Practices -->
+                    <!-- Upcoming Practices - NUEVO DISEÑO ADAPTADO -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                         <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.upcomingPractices">Próximas Prácticas</h2>
                         <div class="space-y-4" id="upcoming-practices">
@@ -354,7 +380,7 @@
                         
                         <!-- Botones de acción -->
                         <div class="flex gap-2 items-end">
-                            <button id="reset-filters" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" data-i18n="common.reset">
+                            <button id="reset-filters" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" data-i18n="common.reset">
                                 Restablecer
                             </button>
                             <button id="export-pdf-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-green-700 transition-colors" data-i18n="common.exportPDF">
@@ -869,7 +895,6 @@
                             <option value="" data-i18n="users.form.selectRole">Seleccione un rol</option>
                             <option value="Administrador" data-i18n="roles.admin">Administrador</option>
                             <option value="Profesor" data-i18n="roles.teacher">Profesor</option>
-                            <option value="Estudiante" data-i18n="roles.student">Estudiante</option>
                         </select>
                     </div>
                 </div>
@@ -984,13 +1009,6 @@
             <i class="fas fa-check-circle"></i>
             <span id="success-text">¡Operación completada exitosamente!</span>
         </div>
-    </div>
-
-    <!-- Botón de Debug Temporal -->
-    <div class="fixed bottom-4 right-4 z-50">
-        <button onclick="debugSchedule()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-            Debug Agenda
-        </button>
     </div>
 
     <script src="../assets/js/dash.js"></script>

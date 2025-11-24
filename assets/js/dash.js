@@ -383,6 +383,8 @@ function abrirModalCerrarSesion() {
     if (modal) {
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        // Oscurecer el header
+        document.getElementById('header-container').classList.add('modal-open');
     }
 }
 
@@ -391,6 +393,8 @@ function cerrarModalCerrarSesion() {
     if (modal) {
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Restaurar el header
+        document.getElementById('header-container').classList.remove('modal-open');
     }
 }
 
@@ -450,6 +454,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mostrar Dashboard por defecto
     showView('dashboard-view');
+    
+    // Cargar las nuevas vistas de actividades y prácticas
+    loadRecentActivities();
+    loadUpcomingPractices();
 });
 
 // Cargar configuración guardada
@@ -609,6 +617,8 @@ function openNewUserModal() {
     const editUserModal = document.getElementById('edit-user-modal');
     editUserModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Abrir modal para editar usuario
@@ -631,6 +641,8 @@ function openEditUserModal(userId) {
     const editUserModal = document.getElementById('edit-user-modal');
     editUserModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Abrir modal para eliminar usuario
@@ -644,6 +656,8 @@ function openDeleteUserModal(userId, userName) {
     const deleteUserModal = document.getElementById('delete-user-modal');
     deleteUserModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Función para mostrar perfil
@@ -655,11 +669,20 @@ function mostrarPerfil() {
     if (hamburgerMenu) hamburgerMenu.classList.remove('active');
 }
 
+// Cerrar menú móvil
+function closeMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    if (mobileMenu) mobileMenu.classList.remove('active');
+    if (hamburgerMenu) hamburgerMenu.classList.remove('active');
+}
+
 // Hacer las funciones globales
 window.mostrarPerfil = mostrarPerfil;
 window.abrirModalCerrarSesion = abrirModalCerrarSesion;
 window.cerrarModalCerrarSesion = cerrarModalCerrarSesion;
 window.confirmarCerrarSesion = confirmarCerrarSesion;
+window.closeMobileMenu = closeMobileMenu;
 
 // Inicializar dashboard
 function initializeDashboard() {
@@ -691,39 +714,115 @@ function updateDashboardStats() {
     document.getElementById('total-subjects').textContent = subjects.length;
 }
 
-// Cargar actividades recientes
+// === NUEVAS FUNCIONES PARA ACTIVIDADES RECIENTES Y PRÓXIMAS PRÁCTICAS ===
+
+// Cargar Actividades Recientes (con nuevo diseño)
 function loadRecentActivities() {
     const activitiesContainer = document.getElementById('recent-activities');
+    if (!activitiesContainer) return;
+    
     activitiesContainer.innerHTML = '';
     
     // Ordenar prácticas por fecha (más recientes primero)
-    const sortedPractices = [...practiceData].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedPractices = [...practiceData].sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+    );
     
     // Tomar las 4 más recientes
     const recentPractices = sortedPractices.slice(0, 4);
     
-    recentPractices.forEach(practice => {
-        const activityDiv = document.createElement('div');
-        activityDiv.className = 'flex items-start gap-3';
-        
-        activityDiv.innerHTML = `
-            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                <i class="fas fa-plus text-primary"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-800 dark:text-white">Actividad Reciente</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">${practice.practice} - ${practice.professor}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(practice.date)}</p>
+    if (recentPractices.length === 0) {
+        activitiesContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No hay actividad reciente</p>
             </div>
         `;
+        return;
+    }
+    
+    recentPractices.forEach(practice => {
+        const activityDiv = document.createElement('div');
+        activityDiv.className = 'activity-item';
+        activityDiv.setAttribute('data-practice-id', practice.id);
+        
+        // Determinar tipo de actividad basado en el estado
+        let activityType, activityIcon, activityIconBg;
+        
+        switch(practice.status) {
+            case 'programada':
+                activityType = 'Nueva práctica programada';
+                activityIcon = 'fas fa-plus-circle';
+                activityIconBg = 'bg-blue-100 text-blue-600';
+                break;
+            case 'confirmada':
+                activityType = 'Práctica Confirmada';
+                activityIcon = 'fas fa-check-circle';
+                activityIconBg = 'bg-green-100 text-green-600';
+                break;
+            case 'en-curso':
+                activityType = 'Práctica en Curso';
+                activityIcon = 'fas fa-play-circle';
+                activityIconBg = 'bg-yellow-100 text-yellow-600';
+                break;
+            case 'completada':
+                activityType = 'Práctica Completada';
+                activityIcon = 'fas fa-flag-checkered';
+                activityIconBg = 'bg-gray-100 text-gray-600';
+                break;
+            case 'cancelada':
+                activityType = 'Práctica Cancelada';
+                activityIcon = 'fas fa-exclamation-triangle';
+                activityIconBg = 'bg-red-100 text-red-600';
+                break;
+            default:
+                activityType = 'Actividad de Práctica';
+                activityIcon = 'fas fa-laptop-code';
+                activityIconBg = 'bg-primary-100 text-primary-600';
+        }
+        
+        // Calcular tiempo relativo
+        const practiceDate = new Date(practice.date);
+        const now = new Date();
+        const diffTime = Math.abs(now - practiceDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        let timeText = '';
+        
+        if (diffDays === 1) {
+            timeText = 'Hoy';
+        } else if (diffDays === 2) {
+            timeText = 'Ayer';
+        } else if (diffDays <= 7) {
+            timeText = `Hace ${diffDays - 1} días`;
+        } else {
+            timeText = formatDate(practice.date);
+        }
+        
+        activityDiv.innerHTML = `
+            <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${activityIconBg}">
+                <i class="${activityIcon} text-sm"></i>
+            </div>
+            <div class="activity-content">
+                <p class="activity-title">${activityType}</p>
+                <p class="activity-detail">${practice.practice} - ${practice.professor}</p>
+                <p class="activity-time">${timeText}</p>
+            </div>
+        `;
+        
+        // Agregar evento click para abrir detalles
+        activityDiv.addEventListener('click', function() {
+            openEditModal(practice.id);
+        });
         
         activitiesContainer.appendChild(activityDiv);
     });
 }
 
-// Cargar próximas prácticas
+// Cargar Próximas Prácticas (con nuevo diseño adaptado)
 function loadUpcomingPractices() {
     const upcomingContainer = document.getElementById('upcoming-practices');
+    if (!upcomingContainer) return;
+    
     upcomingContainer.innerHTML = '';
     
     // Obtener fecha actual
@@ -740,17 +839,91 @@ function loadUpcomingPractices() {
     // Tomar las 4 próximas
     const nextPractices = upcomingPractices.slice(0, 4);
     
+    if (nextPractices.length === 0) {
+        upcomingContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>No hay prácticas próximas</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Mapeo de estados a estilos - Adaptado del diseño proporcionado
+    const practiceStatusStyles = {
+        'programada': { 
+            bg: 'bg-blue-50 dark:bg-blue-900/20',
+            tagBg: 'status-programada',
+            border: 'border-l-blue-500'
+        },
+        'confirmada': { 
+            bg: 'bg-green-50 dark:bg-green-900/20',
+            tagBg: 'status-confirmada',
+            border: 'border-l-green-500'
+        },
+        'en-curso': { 
+            bg: 'bg-yellow-50 dark:bg-yellow-900/20',
+            tagBg: 'status-en-curso',
+            border: 'border-l-yellow-500'
+        },
+        'completada': { 
+            bg: 'bg-gray-50 dark:bg-gray-900/20',
+            tagBg: 'status-completada',
+            border: 'border-l-gray-500'
+        },
+        'cancelada': { 
+            bg: 'bg-red-50 dark:bg-red-900/20',
+            tagBg: 'status-cancelada',
+            border: 'border-l-red-500'
+        }
+    };
+    
+    // Textos para estados
+    const statusTexts = {
+        'programada': 'Programada',
+        'confirmada': 'Confirmada',
+        'en-curso': 'En Curso',
+        'completada': 'Completada',
+        'cancelada': 'Cancelada'
+    };
+    
     nextPractices.forEach(practice => {
+        const styles = practiceStatusStyles[practice.status] || practiceStatusStyles['programada'];
+        const statusText = statusTexts[practice.status] || practice.status;
+        
         const practiceDiv = document.createElement('div');
-        practiceDiv.className = 'flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg';
+        practiceDiv.className = `upcoming-practice-item ${styles.bg}`;
+        practiceDiv.setAttribute('data-practice-id', practice.id);
+        
+        // Formatear fecha para mostrar
+        const practiceDate = new Date(practice.date);
+        const dateText = practiceDate.toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short',
+            year: 'numeric'
+        });
+        
+        // Obtener hora si existe
+        const timeText = practice.time ? ` • ${practice.time}` : '';
         
         practiceDiv.innerHTML = `
-            <div>
-                <p class="text-sm font-medium text-gray-800 dark:text-white">${practice.practice}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">${practice.professor} - ${formatDate(practice.date)}</p>
+            <div class="upcoming-practice-info">
+                <div class="upcoming-practice-name">${practice.practice}</div>
+                <div class="upcoming-practice-meta">${practice.professor} - ${dateText}${timeText}</div>
             </div>
-            <span class="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs rounded-full">Programada</span>
+            <span class="upcoming-practice-status ${styles.tagBg}">${statusText}</span>
         `;
+        
+        // Agregar evento click para abrir detalles
+        practiceDiv.addEventListener('click', function() {
+            openEditModal(practice.id);
+            
+            // Efecto visual de selección
+            const allItems = document.querySelectorAll('.upcoming-practice-item');
+            allItems.forEach(item => item.classList.remove('ring-2', 'ring-primary'));
+            
+            practiceDiv.classList.add('ring-2', 'ring-primary');
+        });
         
         upcomingContainer.appendChild(practiceDiv);
     });
@@ -1000,6 +1173,8 @@ function openNewPracticeModal(day = null, hour = null) {
     const editModal = document.getElementById('edit-modal');
     editModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
     
     // Si se proporcionaron día y hora, prellenar el formulario
     if (day && hour) {
@@ -1122,6 +1297,10 @@ function updateAgendaAfterSave(practice) {
             
             // Regenerar la tabla de agenda
             generateAgendaSchedule();
+            
+            // Actualizar las vistas de actividades y próximas prácticas
+            loadRecentActivities();
+            loadUpcomingPractices();
         }
     }
 }
@@ -1138,6 +1317,10 @@ function updateAgendaAfterDelete(practiceId) {
             
             // Regenerar la tabla de agenda
             generateAgendaSchedule();
+            
+            // Actualizar las vistas de actividades y próximas prácticas
+            loadRecentActivities();
+            loadUpcomingPractices();
         }
     }
 }
@@ -1252,11 +1435,6 @@ function setupEventListeners() {
         closeMobileMenu();
     });
     
-    // Botón de menú móvil
-    document.getElementById('close-mobile-menu').addEventListener('click', function() {
-        closeMobileMenu();
-    });
-    
     // Botones de prácticas - ACTUALIZADOS
     document.getElementById('add-practice-btn').addEventListener('click', function() {
         openNewPracticeModal(); // Modal vacío
@@ -1362,6 +1540,8 @@ function setupModalListeners() {
     function closeEditModalFunc() {
         editModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Restaurar el header
+        document.getElementById('header-container').classList.remove('modal-open');
     }
 
     if (closeEditModal) {
@@ -1499,6 +1679,8 @@ function setupModalListeners() {
     function closeDeleteModalFunc() {
         deleteModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Restaurar el header
+        document.getElementById('header-container').classList.remove('modal-open');
     }
 
     if (closeDeleteModal) {
@@ -1560,6 +1742,8 @@ function setupModalListeners() {
     function closeEditUserModalFunc() {
         editUserModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Restaurar el header
+        document.getElementById('header-container').classList.remove('modal-open');
     }
 
     if (closeEditUserModal) {
@@ -1638,6 +1822,8 @@ function setupModalListeners() {
     function closeDeleteUserModalFunc() {
         deleteUserModal.classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Restaurar el header
+        document.getElementById('header-container').classList.remove('modal-open');
     }
 
     if (closeDeleteUserModal) {
@@ -2015,6 +2201,8 @@ function openEditReportModal(reportId) {
     const editModal = document.getElementById('edit-modal');
     editModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Abrir modal de eliminación para reportes
@@ -2028,6 +2216,8 @@ function openDeleteReportModal(reportId, reportName, reportProfessor, reportDate
     const deleteModal = document.getElementById('delete-modal');
     deleteModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Abrir modal de edición
@@ -2053,6 +2243,8 @@ function openEditModal(practiceId) {
     const editModal = document.getElementById('edit-modal');
     editModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Abrir modal de eliminación
@@ -2066,6 +2258,8 @@ function openDeleteModal(practiceId, practiceName, practiceProfessor, practiceDa
     const deleteModal = document.getElementById('delete-modal');
     deleteModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    // Oscurecer el header
+    document.getElementById('header-container').classList.add('modal-open');
 }
 
 // Filtrar datos de prácticas - CORREGIDO
@@ -2251,3 +2445,4 @@ function formatDate(dateString) {
 
 // Hacer la función debug global
 window.debugSchedule = debugSchedule;
+window.showView = showView;

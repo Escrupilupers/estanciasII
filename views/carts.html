@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Universitario</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos específicos para actividades recientes y próximas prácticas */
+        .activity-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .activity-item:hover {
+            background-color: #f9fafb;
+            transform: translateX(5px);
+        }
+
+        .dark .activity-item:hover {
+            background-color: #374151;
+        }
+
+        .activity-icon {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        .dark .activity-title {
+            color: #f9fafb;
+        }
+
+        .activity-detail {
+            font-size: 0.75rem;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        .dark .activity-detail {
+            color: #d1d5db;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+        .dark .activity-time {
+            color: #6b7280;
+        }
+
+        .practice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .practice-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .practice-info {
+            flex: 1;
+        }
+
+        .practice-name {
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+        .dark .practice-name {
+            color: #f9fafb;
+        }
+
+        .practice-meta {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dark .practice-meta {
+            color: #d1d5db;
+        }
+
+        .practice-status {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+
+        /* Estados de las prácticas */
+        .status-programada {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border-left-color: #3b82f6;
+        }
+        .dark .status-programada {
+            background-color: #1e3a8a;
+            color: #dbeafe;
+        }
+
+        .status-confirmada {
+            background-color: #dcfce7;
+            color: #166534;
+            border-left-color: #22c55e;
+        }
+        .dark .status-confirmada {
+            background-color: #14532d;
+            color: #dcfce7;
+        }
+
+        .status-pendiente {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left-color: #f59e0b;
+        }
+        .dark .status-pendiente {
+            background-color: #78350f;
+            color: #fef3c7;
+        }
+
+        .status-preparacion {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+            border-left-color: #a855f7;
+        }
+        .dark .status-preparacion {
+            background-color: #581c87;
+            color: #f3e8ff;
+        }
+
+        /* Iconos de estado */
+        .status-icon {
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Badge de fecha */
+        .date-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .dark .empty-state {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+    <!-- ... (resto del código del header y sidebar) ... -->
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 md:ml-64 mt-0">
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="fade-in">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6" data-i18n="dashboard.title">Dashboard de Administración</h1>
+            
+            <!-- ... (resto de las tarjetas de estadísticas) ... -->
+            
+            <!-- Recent Activities and Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Activities -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
+                    </div>
+                    <div class="space-y-4 flex-1" id="recent-activities">
+                        <!-- Las actividades se cargarán dinámicamente -->
+                    </div>
+                </div>
+                
+                <!-- Upcoming Practices -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.upcomingPractices">Próximas Prácticas</h2>
+                    <div class="space-y-3" id="upcoming-practices">
+                        <!-- Las prácticas próximas se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === DATOS PARA ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS ===
+
+        // Datos de Actividad Reciente
+        const recentActivities = [
+            { 
+                type: 'Nueva práctica programada', 
+                detail: 'Laboratorio de MAC - Dr. Fued', 
+                time: 'Hace 2 horas', 
+                icon: 'fas fa-plus-circle', 
+                iconBg: 'bg-blue-100 text-blue-600',
+                action: 'view-practice',
+                practiceId: 101
+            },
+            { 
+                type: 'Práctica Completada', 
+                detail: 'Laboratorio de Linux - Prof. Estefano', 
+                time: 'Hace 3 horas', 
+                icon: 'fas fa-check-circle', 
+                iconBg: 'bg-green-100 text-green-600',
+                action: 'view-report',
+                practiceId: 102
+            },
+            { 
+                type: 'Práctica Cancelada', 
+                detail: 'Laboratorio de Windows - Prof. Valeria', 
+                time: 'Hace 1 día', 
+                icon: 'fas fa-exclamation-triangle', 
+                iconBg: 'bg-yellow-100 text-yellow-600',
+                action: 'view-details',
+                practiceId: 103
+            },
+            { 
+                type: 'Nuevo profesor agregado', 
+                detail: 'Dr. Alejandro - Programación', 
+                time: 'Hace 3 días', 
+                icon: 'fas fa-user-plus', 
+                iconBg: 'bg-purple-100 text-purple-600',
+                action: 'view-profile',
+                professorId: 201
+            }
+        ];
+
+        // Datos de Próximas Prácticas
+        const upcomingPracticesData = [
+            { 
+                id: 1, 
+                practice: 'Laboratorio de MAC', 
+                professor: 'Dr. Fued', 
+                date: '23 Nov', 
+                time: '10:00 AM', 
+                status: 'Programada', 
+                statusKey: 'programada',
+                lab: 'Laboratorio 3A',
+                subject: 'Programación Concurrente'
+            },
+            { 
+                id: 2, 
+                practice: 'Laboratorio de Linux', 
+                professor: 'Dr. Fued', 
+                date: '24 Nov', 
+                time: '12:00 PM', 
+                status: 'Confirmada', 
+                statusKey: 'confirmada',
+                lab: 'Laboratorio 2B',
+                subject: 'Sistemas Operativos'
+            },
+            { 
+                id: 3, 
+                practice: 'Laboratorio de Windows', 
+                professor: 'Dr. Octavio', 
+                date: '24 Nov', 
+                time: '09:00 AM', 
+                status: 'Pendiente', 
+                statusKey: 'pendiente',
+                lab: 'Laboratorio 1C',
+                subject: 'Programación I'
+            },
+            { 
+                id: 4, 
+                practice: 'Laboratorio de Windows', 
+                professor: 'Dr. Fued', 
+                date: '25 Nov', 
+                time: '11:00 AM', 
+                status: 'Preparación', 
+                statusKey: 'preparacion',
+                lab: 'Laboratorio 4D',
+                subject: 'Redes de Computadoras'
+            }
+        ];
+
+        // Mapeo de estados a clases de Tailwind para colores
+        const practiceStatusStyles = {
+            programada: { 
+                bg: 'bg-blue-50 dark:bg-blue-950', 
+                tagBg: 'status-programada',
+                icon: 'fas fa-clock text-blue-500'
+            },
+            confirmada: { 
+                bg: 'bg-green-50 dark:bg-green-950', 
+                tagBg: 'status-confirmada',
+                icon: 'fas fa-check-circle text-green-500'
+            },
+            pendiente: { 
+                bg: 'bg-yellow-50 dark:bg-yellow-950', 
+                tagBg: 'status-pendiente',
+                icon: 'fas fa-exclamation-circle text-yellow-500'
+            },
+            preparacion: { 
+                bg: 'bg-purple-50 dark:bg-purple-950', 
+                tagBg: 'status-preparacion',
+                icon: 'fas fa-tools text-purple-500'
+            },
+        };
+
+        // === FUNCIONES PARA CARGAR ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS ===
+
+        // Cargar Actividad Reciente
+        function loadRecentActivities() {
+            const container = document.getElementById('recent-activities');
+            if (!container) return;
+
+            container.innerHTML = ''; 
+
+            if (recentActivities.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No hay actividad reciente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            recentActivities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item';
+                activityItem.setAttribute('data-action', activity.action);
+                activityItem.setAttribute('data-id', activity.practiceId || activity.professorId);
+                
+                activityItem.innerHTML = `
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${activity.iconBg}">
+                        <i class="${activity.icon} text-sm"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p class="activity-title">${activity.type}</p>
+                        <p class="activity-detail">${activity.detail}</p>
+                        <p class="activity-time">${activity.time}</p>
+                    </div>
+                `;
+                
+                // Agregar evento click
+                activityItem.addEventListener('click', function() {
+                    handleActivityClick(activity);
+                });
+                
+                container.appendChild(activityItem);
+            });
+        }
+
+        // Cargar Próximas Prácticas
+        function loadUpcomingPractices() {
+            const container = document.getElementById('upcoming-practices');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (upcomingPracticesData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>No hay prácticas próximas</p>
+                    </div>
+                `;
+                return;
+            }
+
+            upcomingPracticesData.forEach(practice => {
+                const styles = practiceStatusStyles[practice.statusKey] || practiceStatusStyles['programada'];
+                const practiceItem = document.createElement('div');
+                practiceItem.className = `practice-item ${styles.bg}`;
+                practiceItem.setAttribute('data-practice-id', practice.id);
+                
+                practiceItem.innerHTML = `
+                    <div class="practice-info">
+                        <div class="practice-name">${practice.practice}</div>
+                        <div class="practice-meta">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>${practice.professor}</span>
+                            <i class="fas fa-map-marker-alt ml-2"></i>
+                            <span>${practice.lab}</span>
+                        </div>
+                        <div class="practice-meta mt-1">
+                            <span class="date-badge">
+                                <i class="fas fa-calendar"></i>
+                                ${practice.date} • ${practice.time}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="${styles.icon} status-icon"></i>
+                        <span class="practice-status ${styles.tagBg}">${practice.status}</span>
+                    </div>
+                `;
+                
+                // Agregar evento click
+                practiceItem.addEventListener('click', function() {
+                    handlePracticeClick(practice);
+                });
+                
+                container.appendChild(practiceItem);
+            });
+        }
+
+        // === MANEJADORES DE EVENTOS ===
+
+        // Manejar clic en actividad
+        function handleActivityClick(activity) {
+            switch(activity.action) {
+                case 'view-practice':
+                    showPracticeDetails(activity.practiceId);
+                    break;
+                case 'view-report':
+                    showPracticeReport(activity.practiceId);
+                    break;
+                case 'view-details':
+                    showActivityDetails(activity);
+                    break;
+                case 'view-profile':
+                    showProfessorProfile(activity.professorId);
+                    break;
+                default:
+                    console.log('Actividad clickeada:', activity);
+            }
+        }
+
+        // Manejar clic en práctica
+        function handlePracticeClick(practice) {
+            showPracticeDetails(practice.id);
+            
+            // Efecto visual de selección
+            const allItems = document.querySelectorAll('.practice-item');
+            allItems.forEach(item => item.classList.remove('ring-2', 'ring-primary'));
+            
+            event.currentTarget.classList.add('ring-2', 'ring-primary');
+        }
+
+        // === FUNCIONES AUXILIARES ===
+
+        // Mostrar detalles de práctica
+        function showPracticeDetails(practiceId) {
+            // En una implementación real, esto cargaría los datos de la práctica
+            console.log('Mostrando detalles de práctica:', practiceId);
+            
+            // Simular carga de datos
+            const practice = upcomingPracticesData.find(p => p.id === practiceId);
+            if (practice) {
+                showNotification(`Abriendo detalles: ${practice.practice}`, 'info');
+            }
+        }
+
+        // Mostrar reporte de práctica
+        function showPracticeReport(practiceId) {
+            console.log('Mostrando reporte de práctica:', practiceId);
+            showNotification('Generando reporte de práctica...', 'info');
+        }
+
+        // Mostrar detalles de actividad
+        function showActivityDetails(activity) {
+            console.log('Detalles de actividad:', activity);
+            showNotification(`Detalles: ${activity.type}`, 'info');
+        }
+
+        // Mostrar perfil de profesor
+        function showProfessorProfile(professorId) {
+            console.log('Mostrando perfil de profesor:', professorId);
+            showNotification('Cargando perfil del profesor...', 'info');
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'info') {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 ${
+                type === 'info' ? 'bg-blue-500 text-white' : 
+                type === 'success' ? 'bg-green-500 text-white' : 
+                'bg-gray-500 text-white'
+            }`;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'info' ? 'info-circle' : type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // === INICIALIZACIÓN ===
+
+        // Llamar estas funciones al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecentActivities();
+            loadUpcomingPractices();
+        });
+    </script>
+</body>
+</html>
+
+

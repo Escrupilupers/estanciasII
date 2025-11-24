@@ -58,11 +58,16 @@ input:checked + .toggle-slider:before {
     left: 0;
     right: 0;
     z-index: 1000;
+    transition: filter 0.3s ease;
 }
 
 .dark .header-container {
     background-color: #1f2937;
     border-bottom: 1px solid #374151;
+}
+
+.header-container.modal-open {
+    filter: brightness(0.8);
 }
 
 .header {
@@ -554,4 +559,272 @@ input:checked + .toggle-slider:before {
 .sidebar-container {
     position: relative;
     height: 100%;
+}
+
+/* === NUEVOS ESTILOS MEJORADOS PARA ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS === */
+
+/* Grid responsivo */
+.grid.grid-cols-1.lg\:grid-cols-2.gap-6 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .grid.grid-cols-1.lg\:grid-cols-2.gap-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Estilo base de las tarjetas */
+.bg-white.dark\:bg-gray-800 {
+    background-color: white;
+}
+.dark .bg-white.dark\:bg-gray-800 {
+    background-color: #1f2937; /* gray-800 */
+}
+
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.border.border-gray-200.dark\:border-gray-700 {
+    border: 1px solid #e5e7eb; /* gray-200 */
+}
+.dark .border.border-gray-200.dark\:border-gray-700 {
+    border-color: #374151; /* gray-700 */
+}
+
+.flex.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Encabezados de Sección */
+.text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.text-gray-800.dark\:text-white {
+    color: #1f2937; /* gray-800 */
+}
+.dark .text-gray-800.dark\:text-white {
+    color: white;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.flex.justify-between.items-center {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Contenedores de Contenido */
+.space-y-4 > * + * {
+    margin-top: 1rem;
+}
+
+.space-y-3 > * + * {
+    margin-top: 0.75rem;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+/* Estilos específicos para actividades recientes */
+.activity-item {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.activity-item:hover {
+    background-color: #f9fafb;
+    transform: translateX(5px);
+}
+
+.dark .activity-item:hover {
+    background-color: #374151;
+}
+
+.activity-icon {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+.dark .activity-title {
+    color: #f9fafb;
+}
+
+.activity-detail {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+.dark .activity-detail {
+    color: #d1d5db;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+.dark .activity-time {
+    color: #6b7280;
+}
+
+/* === ESTILOS ADAPTADOS PARA PRÓXIMAS PRÁCTICAS === */
+/* Diseño adaptado del código proporcionado */
+.upcoming-practice-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upcoming-practice-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming-practice-info {
+    flex: 1;
+}
+
+.upcoming-practice-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+.dark .upcoming-practice-name {
+    color: #f9fafb;
+}
+
+.upcoming-practice-meta {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+.dark .upcoming-practice-meta {
+    color: #d1d5db;
+}
+
+.upcoming-practice-status {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+/* Estados de las prácticas - Adaptados del diseño proporcionado */
+.status-programada {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+.dark .status-programada {
+    background-color: #1e3a8a;
+    color: #dbeafe;
+}
+
+.status-confirmada {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.dark .status-confirmada {
+    background-color: #14532d;
+    color: #dcfce7;
+}
+
+.status-pendiente {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+.dark .status-pendiente {
+    background-color: #78350f;
+    color: #fef3c8;
+}
+
+.status-en-curso {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+.dark .status-en-curso {
+    background-color: #78350f;
+    color: #fef3c8;
+}
+
+.status-completada {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.dark .status-completada {
+    background-color: #14532d;
+    color: #dcfce7;
+}
+
+.status-cancelada {
+    background-color: #fecaca;
+    color: #dc2626;
+}
+.dark .status-cancelada {
+    background-color: #7f1d1d;
+    color: #fecaca;
+}
+
+/* Estados vacío */
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.dark .empty-state {
+    color: #9ca3af;
 }

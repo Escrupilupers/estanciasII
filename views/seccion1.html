@@ -19,7 +19,10 @@
                         "secondary": "#10b981",
                         "background-light": "#f6f7f8",
                         "background-dark": "#111721",
-                        "new-practice": "#9BD86B"
+                        "new-practice": "#9BD86B",
+                        "icon-blue": "#5BC0F8",
+                        "icon-purple": "#A962FF", 
+                        "icon-yellow": "#FFDE59"
                     },
                     fontFamily: {
                         "display": ["Public Sans"]
@@ -404,6 +407,179 @@
             position: relative;
             height: 100%;
         }
+
+        /* === NUEVOS ESTILOS PARA ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS === */
+        
+        /* Grid responsivo */
+        .grid.grid-cols-1.lg\:grid-cols-2.gap-6 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .grid.grid-cols-1.lg\:grid-cols-2.gap-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Estilo base de las tarjetas */
+        .bg-white.dark\:bg-gray-800 {
+            background-color: white;
+        }
+        .dark .bg-white.dark\:bg-gray-800 {
+            background-color: #1f2937; /* gray-800 */
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .border.border-gray-200.dark\:border-gray-700 {
+            border: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .dark .border.border-gray-200.dark\:border-gray-700 {
+            border-color: #374151; /* gray-700 */
+        }
+
+        .flex.flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Encabezados de Sección */
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .text-gray-800.dark\:text-white {
+            color: #1f2937; /* gray-800 */
+        }
+        .dark .text-gray-800.dark\:text-white {
+            color: white;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .flex.justify-between.items-center {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Contenedores de Contenido */
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+
+        .flex-1 {
+            flex: 1 1 0%;
+        }
+
+        /* Estilos específicos para actividades recientes */
+        .activity-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .activity-icon {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        .dark .activity-title {
+            color: #f9fafb;
+        }
+
+        .activity-detail {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .dark .activity-detail {
+            color: #d1d5db;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+        }
+        .dark .activity-time {
+            color: #6b7280;
+        }
+
+        /* Estilos específicos para próximas prácticas */
+        .practice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .practice-info {
+            flex: 1;
+        }
+
+        .practice-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+        .dark .practice-name {
+            color: #f9fafb;
+        }
+
+        .practice-meta {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .dark .practice-meta {
+            color: #d1d5db;
+        }
+
+        .practice-status {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display">
@@ -600,9 +776,11 @@
                 <!-- Recent Activities and Charts -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Recent Activities -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
-                        <div class="space-y-4" id="recent-activities">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white" data-i18n="dashboard.recentActivities">Actividad Reciente</h2>
+                        </div>
+                        <div class="space-y-4 flex-1" id="recent-activities">
                             <!-- Las actividades se cargarán dinámicamente -->
                         </div>
                     </div>
@@ -610,7 +788,7 @@
                     <!-- Upcoming Practices -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                         <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4" data-i18n="dashboard.upcomingPractices">Próximas Prácticas</h2>
-                        <div class="space-y-4" id="upcoming-practices">
+                        <div class="space-y-3" id="upcoming-practices">
                             <!-- Las prácticas próximas se cargarán dinámicamente -->
                         </div>
                     </div>
@@ -663,6 +841,162 @@
     </div>
 
     <script>
+        // === DATOS PARA ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS ===
+        
+        // Datos de Actividad Reciente
+        const recentActivities = [
+            { 
+                type: 'Nueva práctica programada', 
+                detail: 'Laboratorio de MAC - Dr. Fued', 
+                time: 'Hace 2 horas', 
+                icon: 'fas fa-plus-circle', 
+                iconBg: 'bg-blue-100 text-blue-600'
+            },
+            { 
+                type: 'Práctica Completada', 
+                detail: 'Laboratorio de Linux - Prof. Estefano', 
+                time: 'Hace 3 horas', 
+                icon: 'fas fa-check-circle', 
+                iconBg: 'bg-green-100 text-green-600'
+            },
+            { 
+                type: 'Práctica Cancelada', 
+                detail: 'Laboratorio de Windows - Prof. Valeria', 
+                time: 'Hace 1 día', 
+                icon: 'fas fa-exclamation-triangle', 
+                iconBg: 'bg-yellow-100 text-yellow-600'
+            },
+            { 
+                type: 'Nuevo profesor agregado', 
+                detail: 'Dr. Alejandro - Programación', 
+                time: 'Hace 3 días', 
+                icon: 'fas fa-user-plus', 
+                iconBg: 'bg-purple-100 text-purple-600'
+            }
+        ];
+
+        // Datos de Próximas Prácticas
+        const upcomingPracticesData = [
+            { 
+                id: 1, 
+                practice: 'Laboratorio de MAC', 
+                professor: 'Dr. Fued', 
+                date: '23 Nov', 
+                time: '10:00 AM', 
+                status: 'Programada', 
+                statusKey: 'programada'
+            },
+            { 
+                id: 2, 
+                practice: 'Laboratorio de Linux', 
+                professor: 'Dr. Fued', 
+                date: '24 Nov', 
+                time: '12:00 PM', 
+                status: 'Confirmada', 
+                statusKey: 'confirmada'
+            },
+            { 
+                id: 3, 
+                practice: 'Laboratorio de Windows', 
+                professor: 'Dr. Octavio', 
+                date: '24 Nov', 
+                time: '09:00 AM', 
+                status: 'Pendiente', 
+                statusKey: 'pendiente'
+            },
+            { 
+                id: 4, 
+                practice: 'Laboratorio de Windows', 
+                professor: 'Dr. Fued', 
+                date: '25 Nov', 
+                time: '11:00 AM', 
+                status: 'Preparación', 
+                statusKey: 'preparacion'
+            }
+        ];
+
+        // Mapeo de estados a clases de Tailwind para colores
+        const practiceStatusStyles = {
+            programada: { 
+                bg: 'bg-blue-50 dark:bg-blue-950', 
+                tagBg: 'bg-blue-200 text-blue-800 dark:bg-blue-700 dark:text-blue-100' 
+            },
+            confirmada: { 
+                bg: 'bg-green-50 dark:bg-green-950', 
+                tagBg: 'bg-green-200 text-green-800 dark:bg-green-700 dark:text-green-100' 
+            },
+            pendiente: { 
+                bg: 'bg-yellow-50 dark:bg-yellow-950', 
+                tagBg: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100' 
+            },
+            preparacion: { 
+                bg: 'bg-purple-50 dark:bg-purple-950', 
+                tagBg: 'bg-purple-200 text-purple-800 dark:bg-purple-700 dark:text-purple-100' 
+            },
+        };
+
+        // === FUNCIONES PARA CARGAR ACTIVIDAD RECIENTE Y PRÓXIMAS PRÁCTICAS ===
+
+        // Cargar Actividad Reciente
+        function loadRecentActivities() {
+            const container = document.getElementById('recent-activities');
+            if (!container) return;
+
+            container.innerHTML = ''; 
+
+            if (recentActivities.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No hay actividad reciente.</p>';
+                return;
+            }
+
+            recentActivities.forEach(activity => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'flex items-start gap-3 p-2 rounded-lg';
+                
+                activityItem.innerHTML = `
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${activity.iconBg}">
+                        <i class="${activity.icon} text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-800 dark:text-white">${activity.type}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">${activity.detail}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">${activity.time}</p>
+                    </div>
+                `;
+                container.appendChild(activityItem);
+            });
+        }
+
+        // Cargar Próximas Prácticas
+        function loadUpcomingPractices() {
+            const container = document.getElementById('upcoming-practices');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (upcomingPracticesData.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No hay prácticas próximas.</p>';
+                return;
+            }
+
+            upcomingPracticesData.forEach(practice => {
+                const styles = practiceStatusStyles[practice.statusKey] || practiceStatusStyles['programada'];
+                const practiceItem = document.createElement('div');
+                practiceItem.className = `flex items-center justify-between p-3 rounded-lg text-sm ${styles.bg}`;
+                
+                practiceItem.innerHTML = `
+                    <div>
+                        <p class="font-medium text-gray-800 dark:text-gray-100">${practice.practice}</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-xs">${practice.professor} - ${practice.date}, ${practice.time}</p>
+                    </div>
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full ${styles.tagBg}">${practice.status}</span>
+                `;
+                container.appendChild(practiceItem);
+            });
+        }
+
+        // === CÓDIGO EXISTENTE ===
+
         // Datos de ejemplo para el dashboard
         let practiceData = [
             { 
@@ -871,8 +1205,8 @@
         // Inicializar dashboard
         function initializeDashboard() {
             updateDashboardStats();
-            loadRecentActivities();
-            loadUpcomingPractices();
+            loadRecentActivities(); // Nueva función
+            loadUpcomingPractices(); // Nueva función
         }
 
         // Actualizar estadísticas del dashboard
@@ -896,71 +1230,6 @@
             // Calcular número de asignaturas únicas
             const subjects = [...new Set(practiceData.map(item => item.subject))];
             document.getElementById('total-subjects').textContent = subjects.length;
-        }
-
-        // Cargar actividades recientes
-        function loadRecentActivities() {
-            const activitiesContainer = document.getElementById('recent-activities');
-            activitiesContainer.innerHTML = '';
-            
-            // Ordenar prácticas por fecha (más recientes primero)
-            const sortedPractices = [...practiceData].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Tomar las 4 más recientes
-            const recentPractices = sortedPractices.slice(0, 4);
-            
-            recentPractices.forEach(practice => {
-                const activityDiv = document.createElement('div');
-                activityDiv.className = 'flex items-start gap-3';
-                
-                activityDiv.innerHTML = `
-                    <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                        <i class="fas fa-plus text-primary"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white">Actividad Reciente</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${practice.practice} - ${practice.professor}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${formatDate(practice.date)}</p>
-                    </div>
-                `;
-                
-                activitiesContainer.appendChild(activityDiv);
-            });
-        }
-
-        // Cargar próximas prácticas
-        function loadUpcomingPractices() {
-            const upcomingContainer = document.getElementById('upcoming-practices');
-            upcomingContainer.innerHTML = '';
-            
-            // Obtener fecha actual
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Filtrar prácticas futuras
-            const upcomingPractices = practiceData.filter(practice => {
-                const practiceDate = new Date(practice.date);
-                practiceDate.setHours(0, 0, 0, 0);
-                return practiceDate >= today;
-            }).sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            // Tomar las 4 próximas
-            const nextPractices = upcomingPractices.slice(0, 4);
-            
-            nextPractices.forEach(practice => {
-                const practiceDiv = document.createElement('div');
-                practiceDiv.className = 'flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg';
-                
-                practiceDiv.innerHTML = `
-                    <div>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white">${practice.practice}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">${practice.professor} - ${formatDate(practice.date)}</p>
-                    </div>
-                    <span class="px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs rounded-full">Programada</span>
-                `;
-                
-                upcomingContainer.appendChild(practiceDiv);
-            });
         }
 
         // Actualizar enlace activo en el sidebar
