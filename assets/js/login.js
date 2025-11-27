@@ -51,12 +51,27 @@ form.addEventListener('submit', async (e) => {
       return;
     }
 
+    // ---------------------------------------------------------
+    // 🔥 NORMALIZAR EL USUARIO PARA QUE EL FRONT NO FALLE
+    // ---------------------------------------------------------
+    const usuarioNormalizado = {
+      id_usuario: data.usuario.id,      // backend → frontend
+      nombre: data.usuario.nombre,
+      apellido: data.usuario.apellido,
+      email: data.usuario.email,
+      rol: data.usuario.role            // backend → frontend
+    };
+
+    // Guardar en localStorage
+    localStorage.setItem("usuario", JSON.stringify(usuarioNormalizado));
+    // ---------------------------------------------------------
+
     // ✔️ LOGIN EXITOSO → animación
     alerta.style.display = 'none';
     form.innerHTML = `
       <div style="padding: 20px; text-align:center;">
         <i class="bi bi-check-circle-fill text-success" style="font-size: 60px;"></i>
-        <h5 class="mt-3">Welcome, ${data.usuario.nombre}!</h5>
+        <h5 class="mt-3">Welcome, ${usuarioNormalizado.nombre}!</h5>
         <p>Redirecting to dashboard...</p>
       </div>
     `;
